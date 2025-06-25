@@ -1,4 +1,4 @@
-defmodule PhxplateUmbrella.MixProject do
+defmodule Umbrella.MixProject do
   use Mix.Project
 
   def project do
@@ -7,13 +7,8 @@ defmodule PhxplateUmbrella.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: []
-    ]
-  end
-
-  def application do
-    [
-      extra_applications: [:logger]
+      deps: deps(),
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -24,11 +19,11 @@ defmodule PhxplateUmbrella.MixProject do
         "do --app core ecto.create",
         "do --app core ecto.migrate",
         "do --app core run apps/core/priv/repo/seeds.exs",
-        "do --app web assets.setup",
+        "do --app public assets.setup",
         "do --app admin assets.setup"
       ],
       "app.build": [
-        "do --app web assets.build",
+        "do --app public assets.build",
         "do --app admin assets.build"
       ],
       setup: ["deps.get.all", "app.setup", "app.build"],
@@ -38,22 +33,25 @@ defmodule PhxplateUmbrella.MixProject do
         "do --app core run apps/core/priv/repo/seeds.exs"
       ],
       "ecto.reset": ["do --app core ecto.reset"],
-      "web.server": ["do --app web phx.server"],
+      "public.server": ["do --app public phx.server"],
       "admin.server": ["do --app admin phx.server"],
-      run: ["web.server", "admin.server"],
-      test: ["test"],
+      run: ["public.server", "admin.server"],
       "assets.setup": [
-        "do --app web assets.setup",
+        "do --app public assets.setup",
         "do --app admin assets.setup"
       ],
       "assets.build": [
-        "do --app web assets.build",
+        "do --app public assets.build",
         "do --app admin assets.build"
       ],
       "assets.deploy": [
-        "do --app web assets.deploy",
+        "do --app public assets.deploy",
         "do --app admin assets.deploy"
       ]
     ]
+  end
+
+  defp deps do
+    []
   end
 end

@@ -5,10 +5,14 @@ defmodule Core.MixProject do
     [
       app: :core,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -19,14 +23,6 @@ defmodule Core.MixProject do
     ]
   end
 
-  defp aliases do
-    [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
-    ]
-  end
-
   defp deps do
     [
       {:phoenix_ecto, "~> 4.5"},
@@ -34,7 +30,7 @@ defmodule Core.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:dns_cluster, "~> 0.1.1"},
       {:bcrypt_elixir, "~> 3.0"},
-      {:swoosh, "~> 1.5"},
+      {:swoosh, "~> 1.16"},
       {:finch, "~> 0.13"},
       {:jason, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},

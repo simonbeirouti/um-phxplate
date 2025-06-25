@@ -15,31 +15,41 @@ config :core,
 
 config :core, Core.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "123qwe!Q",
   hostname: "localhost",
   database: "phxplate_umbrella_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
-# Configure Web app
-config :web,
-  generators: [context_app: :core]
+# Configures Elixir's Logger
+config :logger, :default_formatter,
+  format: "$time $metadata[$level] $message\n",
+  metadata: [:request_id]
 
-config :web, Web.Endpoint,
+# Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
+
+# Public app configuration
+config :public,
+  generators: [context_app: false]
+
+# Configures the public endpoint
+config :public, Public.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
-    formats: [html: Web.ErrorHTML, json: Web.ErrorJSON],
+    formats: [html: Public.ErrorHTML, json: Public.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Web.PubSub,
-  live_view: [signing_salt: "iQsaUaJI"]
+  pubsub_server: Public.PubSub,
+  live_view: [signing_salt: "7VKiCGMA"]
 
-# Configure Admin app
+# Admin app configuration
 config :admin,
-  generators: [context_app: :core]
+  generators: [context_app: false]
 
+# Configures the admin endpoint
 config :admin, Admin.Endpoint,
   url: [host: "localhost"],
   adapter: Bandit.PhoenixAdapter,
@@ -48,51 +58,41 @@ config :admin, Admin.Endpoint,
     layout: false
   ],
   pubsub_server: Admin.PubSub,
-  live_view: [signing_salt: "P/gIKdUD"]
+  live_view: [signing_salt: "bq5GGUXG"]
 
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
-  web: [
+  public: [
     args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
-    cd: Path.expand("../apps/web/assets", __DIR__),
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/*),
+    cd: Path.expand("../apps/public/assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ],
   admin: [
     args:
-      ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
+      ~w(js/app.js --bundle --target=es2022 --outdir=../priv/static/assets/js --external:/fonts/* --external:/images/*),
     cd: Path.expand("../apps/admin/assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.4.3",
-  web: [
+  version: "4.0.9",
+  public: [
     args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
+      --input=assets/css/app.css
+      --output=priv/static/assets/css/app.css
     ),
-    cd: Path.expand("../apps/web/assets", __DIR__)
+    cd: Path.expand("../apps/public", __DIR__)
   ],
   admin: [
     args: ~w(
-      --config=tailwind.config.js
-      --input=css/app.css
-      --output=../priv/static/assets/app.css
+      --input=assets/css/app.css
+      --output=priv/static/assets/css/app.css
     ),
-    cd: Path.expand("../apps/admin/assets", __DIR__)
+    cd: Path.expand("../apps/admin", __DIR__)
   ]
-
-# Configures Elixir's Logger
-config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:request_id]
-
-# Use Jason for JSON parsing in Phoenix
-config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

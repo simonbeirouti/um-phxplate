@@ -1,32 +1,22 @@
 import Config
 
-# Configure Core database for development
-config :core, Core.Repo,
-  username: "postgres",
-  password: "123qwe!Q",
-  hostname: "localhost",
-  database: "phxplate_umbrella_dev",
-  stacktrace: true,
-  show_sensitive_data_on_connection_error: true,
-  pool_size: 10
-
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :web, Web.Endpoint,
+config :public, Public.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "N2s7C8NllCwvxDowtKiRitVZXQOBbEVODp4Q7YpBo1fyx7ShDw8ZmAb0UIs8Cgrb",
+  secret_key_base: "pbQ3W++6DCWbFCM82BxFbooJx6UC727lyhMckNkcdJ7ZNj6PS/ymGpBaHceuGQjW",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:web, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:web, ~w(--watch)]}
+    esbuild: {Esbuild, :install_and_run, [:public, ~w(--sourcemap=inline --watch)]},
+    tailwind: {Tailwind, :install_and_run, [:public, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -53,17 +43,18 @@ config :web, Web.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :web, Web.Endpoint,
+config :public, Public.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/public/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :web, dev_routes: true
+config :public, dev_routes: true
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -74,11 +65,11 @@ config :web, dev_routes: true
 config :admin, Admin.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
-  http: [ip: {127, 0, 0, 1}, port: 4001],
+  http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4001")],
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "cD4TgEY4+9Qin5+NZaG2vuX4xnb8fezi6Cpp7r/Esjkd37QgwPXVfIWI6acRdv3a",
+  secret_key_base: "REgaIfXVBPTt6bDAJ17UAMRgWe1LnZUQhqeinLOlQR5lj9o5Sx7AelIRR87UD7w+",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:admin, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:admin, ~w(--watch)]}
@@ -110,10 +101,11 @@ config :admin, Admin.Endpoint,
 # Watch static and templates for browser reloading.
 config :admin, Admin.Endpoint,
   live_reload: [
+    web_console_logger: true,
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/admin/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/admin/(?:controllers|live|components|router)/?.*\.(ex|heex)$"
     ]
   ]
 
