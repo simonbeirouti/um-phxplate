@@ -1,4 +1,4 @@
-# PhxplateUmbrella
+# Umbrella
 
 A comprehensive Phoenix umbrella application designed for building scalable, multi-tenant SaaS platforms with advanced features including AI integration, subscription management, and administrative capabilities.
 
@@ -10,9 +10,8 @@ This umbrella project is organized into four main applications, each serving a s
 umbrella/
 ├── apps/
 │   ├── core/       # Business logic and shared modules
-│   ├── web/        # Public-facing web application
+│   ├── public/     # Public-facing application
 │   ├── admin/      # Administrative interface
-│   └── ui/         # Shared UI components library
 ├── config/         # Shared configuration
 └── deps/           # Shared dependencies
 ```
@@ -28,7 +27,7 @@ The foundation of the platform containing:
 - Subscription and payment processing
 - User authentication and authorization
 
-### Web (`apps/web/`)
+### Web (`apps/public/`)
 The main public-facing application featuring:
 - User registration and authentication
 - Company management and directory
@@ -45,14 +44,6 @@ Administrative interface providing:
 - AI chat interface for testing
 - Platform analytics and reporting
 - Support ticket management
-
-### UI (`apps/ui/`)
-Shared component library containing:
-- Reusable Phoenix LiveView components
-- Consistent styling and themes
-- Form components and utilities
-- Common UI patterns and layouts
-- Tailwind CSS configurations
 
 ## Key Features
 
@@ -87,7 +78,7 @@ Shared component library containing:
    ```bash
    mix run 
    or 
-   mix web.server
+   mix public.server
    mix admin.server
    ```
 
@@ -105,7 +96,5 @@ The umbrella structure provides several advantages:
 
 Visit the individual app READMEs for specific setup instructions:
 - [Core Application](apps/core/README.md)
-- [Web Application](apps/web/README.md) 
+- [Public Application](apps/public/README.md) 
 - [Admin Application](apps/admin/README.md)
-- [UI Components](apps/ui/README.md)
-

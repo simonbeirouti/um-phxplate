@@ -38,9 +38,7 @@ defmodule Admin do
 
   def controller do
     quote do
-      use Phoenix.Controller,
-        formats: [:html, :json],
-        layouts: [html: Admin.Layouts]
+      use Phoenix.Controller, formats: [:html, :json]
 
       use Gettext, backend: Admin.Gettext
 
@@ -52,8 +50,7 @@ defmodule Admin do
 
   def live_view do
     quote do
-      use Phoenix.LiveView,
-        layout: {Admin.Layouts, :app}
+      use Phoenix.LiveView
 
       unquote(html_helpers())
     end
@@ -90,8 +87,9 @@ defmodule Admin do
       # Core UI components
       import Admin.CoreComponents
 
-      # Shortcut for generating JS commands
+      # Common modules used in templates
       alias Phoenix.LiveView.JS
+      alias Admin.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

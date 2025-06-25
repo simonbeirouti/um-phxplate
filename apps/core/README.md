@@ -1,6 +1,6 @@
 # Core
 
-The Core application serves as the foundational layer of the PhxplateUmbrella project, containing all business logic, data models, and shared services that power the entire platform.
+The Core application serves as the foundational layer of the Umbrella project, containing all business logic, data models, and shared services that power the entire platform.
 
 ## Purpose
 
@@ -212,4 +212,3 @@ When adding new features to Core:
 5. **Consider Performance**: Optimize database queries and avoid N+1 problems
 
 The Core application is the foundation that enables all other applications in the umbrella to function effectively. Changes here impact the entire system, so careful consideration and testing are essential.
-
