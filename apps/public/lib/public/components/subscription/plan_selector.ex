@@ -30,49 +30,45 @@ defmodule Public.Components.Subscription.PlanSelector do
   attr :target, :any, default: nil, doc: "The target for phx-target, if any."
   attr :loading, :boolean, default: false, doc: "Whether the plan selection is loading."
   attr :proration_info, :map, default: %{}, doc: "Proration information for plan upgrades."
+  attr :selected_interval, :string, default: "month", doc: "Currently selected billing interval."
 
   def plan_selector(assigns) do
     ~H"""
-    <div>
-      <div role="tablist" class="tabs tabs-box w-fit mx-auto mt-4">
-        <input
-          type="radio"
-          name="plan_interval_tabs"
-          role="tab"
-          class="tab"
-          aria-label="Monthly"
-          checked
-        />
-        <div role="tabpanel" class="tab-content p-4 mt-8">
-          <div class="grid lg:grid-cols-3 gap-3 max-w-6xl mx-auto">
-            <.plan_card
-              :for={plan <- filter_plans(@plans, "month")}
-              plan={plan}
-              is_popular={plan.metadata["tier"] == "medium"}
-              current_user={@current_user}
-              current_subscription={@current_subscription}
-              proration_info={@proration_info[plan.metadata["tier"]]}
-              target={@target}
-              loading={@loading}
-            />
-          </div>
+    <div class="w-full">
+      <!-- Centered tabs -->
+      <div class="flex justify-center mb-8 md:mb-16">
+        <div class="tabs tabs-box bg-base-200">
+          <button
+            class={"tab" <> if(@selected_interval == "month", do: " tab-active", else: "")}
+            phx-click="change_interval"
+            phx-value-interval="month"
+            phx-target={@target}
+          >
+            Monthly
+          </button>
+          <button
+            class={"tab" <> if(@selected_interval == "year", do: " tab-active", else: "")}
+            phx-click="change_interval"
+            phx-value-interval="year"
+            phx-target={@target}
+          >
+            Yearly
+          </button>
         </div>
+      </div>
 
-        <input type="radio" name="plan_interval_tabs" role="tab" class="tab" aria-label="Yearly" />
-        <div role="tabpanel" class="tab-content p-4 mt-8">
-          <div class="grid lg:grid-cols-3 gap-3 max-w-6xl mx-auto">
-            <.plan_card
-              :for={plan <- filter_plans(@plans, "year")}
-              plan={plan}
-              is_popular={plan.metadata["tier"] == "medium"}
-              current_user={@current_user}
-              current_subscription={@current_subscription}
-              proration_info={@proration_info[plan.metadata["tier"]]}
-              target={@target}
-              loading={@loading}
-            />
-          </div>
-        </div>
+      <!-- Plans content -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-1 max-w-7xl mx-auto px-4">
+        <.plan_card
+          :for={plan <- filter_plans(@plans, @selected_interval)}
+          plan={plan}
+          is_popular={plan.metadata["tier"] == "medium"}
+          current_user={@current_user}
+          current_subscription={@current_subscription}
+          proration_info={@proration_info[plan.metadata["tier"]]}
+          target={@target}
+          loading={@loading}
+        />
       </div>
     </div>
     """
@@ -95,22 +91,29 @@ defmodule Public.Components.Subscription.PlanSelector do
 
   def plan_card(assigns) do
     ~H"""
-    <div class={"card bg-base-100 shadow-lg" <> if(@is_popular, do: " border-2 border-primary lg:scale-110", else: " border border-base-300")}>
+    <div class={"card bg-base-100 shadow-xl relative" <> if(@is_popular, do: " border-2 border-primary transform md:scale-105 md:-mt-2 z-10", else: " border border-base-300")}>
       <%= if @is_popular do %>
-        <div class="absolute -top-3 right-4 badge badge-primary badge-lg">
-          Most Popular
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-20 w-2/3">
+          <div class="badge badge-primary badge-lg px-4 py-2 text-white font-semibold w-full">
+            Most Popular
+          </div>
         </div>
       <% end %>
 
-      <div class="card-body">
-        <h2 class="card-title text-xl">{@plan.name}</h2>
-        <div class="text-3xl font-bold">
-          {format_price(@plan)}
-          <span class="ml-1 text-sm font-normal text-base-content/70">/ {@plan.interval}</span>
+      <div class="card-body p-8">
+        <div class="text-left mb-6">
+          <h2 class="card-title text-2xl font-bold">{@plan.name}</h2>
+          <div class="text-4xl font-bold mt-4 text-primary">
+            {format_price(@plan)}
+            <span class="text-lg font-normal text-base-content/70">/ {@plan.interval}</span>
+          </div>
+          <p class="text-base-content/70 mt-3 text-lg">
+            {@plan.description}
+          </p>
         </div>
 
         <%= if @proration_info && @proration_info.is_upgrade && @plan.id == @proration_info.plan_id do %>
-          <div class="alert alert-success mt-2">
+          <div class="alert alert-success mb-6">
             <.icon name="hero-check-circle" class="size-4" />
             <div>
               <p class="text-sm">
@@ -125,20 +128,18 @@ defmodule Public.Components.Subscription.PlanSelector do
           </div>
         <% end %>
 
-        <p class="text-base-content/70 mt-2">
-          {@plan.description}
-        </p>
-
-        <ul class="space-y-4 my-4">
+        <ul class="space-y-2 flex-grow">
           <%= for feature_key <- get_ordered_features(@plan) do %>
-            <li class="flex items-start gap-2">
-              <span class="text-primary">✓</span>
-              <span class="text-sm">{Map.get(@plan.features, feature_key, "")}</span>
+            <li class="flex items-center gap-3">
+              <div class="flex-shrink-0">
+                <.icon name="hero-check" class="size-5 text-success" />
+              </div>
+              <span class="text-base-content">{Map.get(@plan.features, feature_key, "")}</span>
             </li>
           <% end %>
         </ul>
 
-        <div class="card-actions justify-end mt-auto">
+        <div class="card-actions mt-8">
           <%= if @current_user && @current_subscription && @current_subscription.plan_id == @plan.id do %>
             <button class="btn btn-disabled w-full">Current Plan</button>
           <% else %>
@@ -146,7 +147,7 @@ defmodule Public.Components.Subscription.PlanSelector do
               phx-click="select_plan"
               phx-value-plan-id={@plan.id}
               phx-target={@target}
-              class="btn btn-primary w-full"
+              class={"btn w-full" <> if(@is_popular, do: " btn-primary", else: " btn-outline btn-primary")}
               disabled={@loading}
             >
               <%= if @loading do %>

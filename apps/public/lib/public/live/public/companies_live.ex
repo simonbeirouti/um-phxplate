@@ -70,20 +70,22 @@ defmodule Public.CompaniesLive do
       <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <%= for company <- @companies do %>
           <.link navigate={~p"/companies/#{company.id}"} class="block">
-            <div class="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
-              <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <div class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+              <figure class="h-48 bg-base-200">
                 <%= if company.logo do %>
                   <img src={company.logo} alt={company.name} class="h-full w-full object-cover" />
                 <% else %>
-                  <div class="text-4xl font-bold text-gray-400">
-                    <%= String.first(company.name) %>
+                  <div class="flex items-center justify-center h-full">
+                    <div class="text-4xl font-bold text-base-content/50">
+                      <%= String.first(company.name) %>
+                    </div>
                   </div>
                 <% end %>
-              </div>
-              <div class="p-6">
-                <h3 class="text-xl font-semibold text-gray-900"><%= company.name %></h3>
+              </figure>
+              <div class="card-body">
+                <h3 class="card-title text-base-content"><%= company.name %></h3>
                 <%= if company.description do %>
-                  <p class="mt-2 text-gray-600 line-clamp-2"><%= company.description %></p>
+                  <p class="text-base-content/70 line-clamp-2"><%= company.description %></p>
                 <% end %>
               </div>
             </div>

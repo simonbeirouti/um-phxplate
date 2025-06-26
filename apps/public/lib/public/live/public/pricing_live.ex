@@ -73,7 +73,8 @@ defmodule Public.PricingLive do
        current_subscription: subscription,
        loading: false,
        subscriptions_enabled: subscriptions_enabled,
-       single_purchases_enabled: single_purchases_enabled
+       single_purchases_enabled: single_purchases_enabled,
+       selected_interval: "month"
      )}
   end
 
@@ -97,6 +98,7 @@ defmodule Public.PricingLive do
             current_user={@current_user}
             current_subscription={@current_subscription}
             loading={@loading}
+            selected_interval={@selected_interval}
           />
         </div>
       <% end %>
@@ -114,20 +116,29 @@ defmodule Public.PricingLive do
       <.cta />
     <% else %>
       <div class="mx-auto max-w-4xl p-4 text-center">
-        <div class="bg-gray-50 border border-gray-200 rounded-lg p-12">
-          <.icon name="hero-info" class="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">Pricing coming soon!</h2>
-          <p class="text-gray-600 mb-6">
-            Pricing and subscription options are currently not available.
-            Please check back later or contact support for more information.
-          </p>
-          <.link navigate={~p"/contact"}>
-            <button class="btn btn-primary">Contact Support</button>
-          </.link>
+        <div class="card bg-base-100 shadow-sm">
+          <div class="card-body">
+            <.icon name="hero-information-circle" class="h-12 w-12 mx-auto text-base-content/40 mb-4" />
+            <h2 class="card-title text-2xl justify-center text-base-content mb-4">Pricing coming soon!</h2>
+            <p class="text-base-content/70 mb-6">
+              Pricing and subscription options are currently not available.
+              Please check back later or contact support for more information.
+            </p>
+            <div class="card-actions justify-center">
+              <.link navigate={~p"/contact"}>
+                <button class="btn btn-primary">Contact Support</button>
+              </.link>
+            </div>
+          </div>
         </div>
       </div>
     <% end %>
     """
+  end
+
+  @impl true
+  def handle_event("change_interval", %{"interval" => interval}, socket) do
+    {:noreply, assign(socket, :selected_interval, interval)}
   end
 
   @impl true

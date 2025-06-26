@@ -77,26 +77,26 @@ defmodule Public.CompanyShowLive do
           </button>
         </.link>
       </div>
-      <div class="bg-white shadow overflow-hidden rounded-lg">
-        <div class="relative h-64 sm:h-96 bg-gray-200">
+      <div class="card bg-base-100 shadow-lg">
+        <figure class="relative h-64 sm:h-96 bg-base-200">
           <%= if @company.logo do %>
             <img src={@company.logo} alt={@company.name} class="h-full w-full object-cover" />
           <% else %>
             <div class="absolute inset-0 flex items-center justify-center">
-              <div class="text-6xl font-bold text-gray-400">
-                {String.first(@company.name)}
+              <div class="text-6xl font-bold text-base-content/50">
+                <%= String.first(@company.name) %>
               </div>
             </div>
           <% end %>
-        </div>
+        </figure>
 
-        <div class="px-4 py-5 sm:px-6">
+        <div class="card-body">
           <div class="flex items-center justify-between">
-            <h3 class="text-3xl font-bold text-gray-900">{@company.name}</h3>
+            <h1 class="card-title text-3xl text-base-content"><%= @company.name %></h1>
             <%= if @current_user do %>
               <button
                 phx-click={if @bookmarked, do: "unbookmark", else: "bookmark"}
-                class="inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium">
+                class={["btn btn-ghost", if(@bookmarked, do: "btn-primary", else: "")]}>
                 <%= if @bookmarked do %>
                   <.icon name="hero-bookmark-solid" class="h-5 w-5" />
                 <% else %>
@@ -106,18 +106,20 @@ defmodule Public.CompanyShowLive do
             <% end %>
           </div>
           <%= if @company.description do %>
-            <p class="mt-4 text-gray-600">{@company.description}</p>
+            <p class="text-base-content/80 mt-4"><%= @company.description %></p>
           <% end %>
         </div>
 
-        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
-          <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
+        <div class="divider mx-6"></div>
+
+        <div class="card-body pt-0">
+          <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
             <%= if @company.website do %>
               <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Website</dt>
+                <dt class="text-sm font-medium text-base-content/60">Website</dt>
                 <dd class="mt-1">
-                  <a href={@company.website} target="_blank" class="text-blue-600 hover:text-blue-500">
-                    {@company.website}
+                  <a href={@company.website} target="_blank" class="link link-primary">
+                    <%= @company.website %>
                   </a>
                 </dd>
               </div>
@@ -125,10 +127,10 @@ defmodule Public.CompanyShowLive do
 
             <%= if @company.email do %>
               <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                <dt class="text-sm font-medium text-base-content/60">Email</dt>
                 <dd class="mt-1">
-                  <a href={"mailto:#{@company.email}"} class="text-blue-600 hover:text-blue-500">
-                    {@company.email}
+                  <a href={"mailto:#{@company.email}"} class="link link-primary">
+                    <%= @company.email %>
                   </a>
                 </dd>
               </div>
@@ -136,10 +138,10 @@ defmodule Public.CompanyShowLive do
 
             <%= if @company.phone do %>
               <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                <dt class="text-sm font-medium text-base-content/60">Phone</dt>
                 <dd class="mt-1">
-                  <a href={"tel:#{@company.phone}"} class="text-blue-600 hover:text-blue-500">
-                    {@company.phone}
+                  <a href={"tel:#{@company.phone}"} class="link link-primary">
+                    <%= @company.phone %>
                   </a>
                 </dd>
               </div>
@@ -147,8 +149,8 @@ defmodule Public.CompanyShowLive do
 
             <%= if @company.address do %>
               <div class="sm:col-span-1">
-                <dt class="text-sm font-medium text-gray-500">Address</dt>
-                <dd class="mt-1 text-gray-900">{@company.address}</dd>
+                <dt class="text-sm font-medium text-base-content/60">Address</dt>
+                <dd class="mt-1 text-base-content"><%= @company.address %></dd>
               </div>
             <% end %>
           </dl>

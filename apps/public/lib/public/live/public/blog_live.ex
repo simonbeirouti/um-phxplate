@@ -65,29 +65,29 @@ defmodule Public.BlogLive do
       <%= if Enum.empty?(@posts) do %>
         <div class="text-center py-12">
           <div class="max-w-md mx-auto">
-            <.icon name="hero-file-text" class="mx-auto h-12 w-12 text-gray-400" />
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No posts yet</h3>
-            <p class="mt-1 text-sm text-gray-500">Check back soon for new content!</p>
+            <.icon name="hero-document-text" class="mx-auto h-12 w-12 text-base-content/40" />
+            <h3 class="mt-2 text-sm font-medium text-base-content">No posts yet</h3>
+            <p class="mt-1 text-sm text-base-content/60">Check back soon for new content!</p>
           </div>
         </div>
       <% else %>
-        <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
+        <div class="gap-6 grid grid-cols-1 sm:grid-cols-2">
           <%= for post <- @posts do %>
-            <.link href={~p"/blog/#{post.slug}"}>
-              <article class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div class="p-6">
-                  <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-3">{post.title}</h2>
-                    <time class="text-sm text-gray-500">
-                      {format_date(post.inserted_at)}
+            <.link href={~p"/blog/#{post.slug}"} class="block">
+              <article class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow duration-200">
+                <div class="card-body">
+                  <div class="flex flex-col md:flex-row items-start justify-between mb-4 gap-2">
+                    <h2 class="card-title text-xl text-base-content"><%= post.title %></h2>
+                    <time class="text-sm text-base-content/60 whitespace-nowrap">
+                      <%= format_date(post.inserted_at) %>
                     </time>
                   </div>
 
-                  <p class="text-gray-600 mb-4 leading-relaxed text-center md:text-left">
-                    {post.description || Markdown.excerpt(post.content, 200)}
+                  <p class="text-base-content/70 mb-4 leading-relaxed">
+                    <%= post.description || Markdown.excerpt(post.content, 200) %>
                   </p>
 
-                  <div class="flex items-center justify-center md:justify-start">
+                  <div class="card-actions justify-end">
                     Read more <.icon name="hero-arrow-right" class="ml-2 h-4 w-4" />
                   </div>
                 </div>
@@ -111,7 +111,7 @@ defmodule Public.BlogLive do
                   phx-click="paginate"
                   phx-value-page={page_num}
                 >
-                  {page_num}
+                  <%= page_num %>
                 </button>
               <% end %>
 

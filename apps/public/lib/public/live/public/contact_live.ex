@@ -20,56 +20,69 @@ defmodule Public.ContactLive do
   def render(assigns) do
     ~H"""
     <.header_section title="Contact Us" subtitle="We'd love to hear from you" />
-    <div class="max-w-3xl mx-auto px-4 my-24">
-      <form id="contact-form" phx-submit="submit" phx-change="validate">
-        <fieldset class="fieldset w-full">
-          <div class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <input
-                class="input text-base w-full"
-                name={@form[:name].name}
-                id={@form[:name].id}
-                value={@form[:name].value}
-                type="text"
-                placeholder="Your name"
-                required
-              />
-              <input
-                class="input text-base w-full"
-                name={@form[:email].name}
-                id={@form[:email].id}
-                value={@form[:email].value}
-                type="email"
-                placeholder="your@email.com"
-                required
-              />
+    <div class="max-w-3xl mx-auto px-4 my-12">
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <form id="contact-form" phx-submit="submit" phx-change="validate">
+            <div class="space-y-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="form-control">
+                  <input
+                    class="input input-bordered text-base w-full"
+                    name={@form[:name].name}
+                    id={@form[:name].id}
+                    value={@form[:name].value}
+                    type="text"
+                    placeholder="Your name"
+                    required
+                  />
+                </div>
+                <div class="form-control">
+                  <input
+                    class="input input-bordered text-base w-full"
+                    name={@form[:email].name}
+                    id={@form[:email].id}
+                    value={@form[:email].value}
+                    type="email"
+                    placeholder="your@email.com"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="form-control">
+                <input
+                  class="input input-bordered text-base w-full"
+                  name={@form[:subject].name}
+                  id={@form[:subject].id}
+                  value={@form[:subject].value}
+                  placeholder="What is this regarding?"
+                  required
+                />
+              </div>
+
+              <div class="form-control">
+                <textarea
+                  class="textarea textarea-bordered text-base w-full min-h-32"
+                  name={@form[:message].name}
+                  id={@form[:message].id}
+                  value={@form[:message].value}
+                  placeholder="How can we help you?"
+                  required
+                ></textarea>
+              </div>
+
+              <input type="hidden" name="user_id" value={@current_user_id} />
             </div>
 
-            <input
-              class="input text-base w-full"
-              name={@form[:subject].name}
-              id={@form[:subject].id}
-              value={@form[:subject].value}
-              placeholder="What is this regarding?"
-              required
-            />
-            <textarea
-              class="textarea text-base w-full"
-              name={@form[:message].name}
-              id={@form[:message].id}
-              value={@form[:message].value}
-              placeholder="How can we help you?"
-              required
-            />
-
-            <input type="hidden" name="user_id" value={@current_user_id} />
-          </div>
-
-          <button type="submit" phx-disable-with="Sending..." class="btn btn-primary w-full">
-            Send Message
-          </button>
-        </fieldset>
-      </form>
+            <div class="card-actions justify-end mt-6">
+              <button type="submit" phx-disable-with="Sending..." class="btn btn-primary w-full">
+                Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
     <.cta />
     """

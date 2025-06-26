@@ -35,8 +35,8 @@ defmodule Public.Components.Markdown do
         github_pre_lang: true,
         # Escape potentially dangerous HTML
         escape: false,
-        # Use unsafe_ instead of unsafe
-        unsafe_: false
+        # Allow unsafe HTML rendering (be careful with user content)
+        unsafe: false
       ],
       # Parse options
       parse: [
