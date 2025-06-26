@@ -1,6 +1,6 @@
 # Admin
 
-The Admin application provides a comprehensive administrative interface for super administrators to manage the entire PhxplateUmbrella platform, including user management, subscription oversight, AI chat testing, and system analytics.
+The Admin application provides a comprehensive administrative interface for super administrators to manage the entire Umbrella platform, including user management, subscription oversight, AI chat testing, and system analytics.
 
 ## Purpose
 
@@ -166,7 +166,7 @@ lib/admin/
 4. **Create Super Admin Account**:
    ```bash
    # Run from umbrella root
-   mix run -e "Phxplate.Accounts.create_super_admin(\"admin@example.com\", \"password123\")"
+   mix run -e "Core.Accounts.create_super_admin(\"admin@example.com\", \"password123\")"
    ```
 
 5. **Start Development Server**:

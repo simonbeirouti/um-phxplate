@@ -25,6 +25,8 @@ defmodule Core.MixProject do
 
   defp deps do
     [
+      {:phoenix, "~> 1.8.0-rc.3"},
+      {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},

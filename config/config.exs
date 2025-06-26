@@ -11,7 +11,14 @@ import Config
 
 # Configure Core app (database layer)
 config :core,
-  ecto_repos: [Core.Repo]
+  title: "PHXPlate",
+  description: "Your starting place for a SaaS using Phoenix and Elixir.",
+  public_base_url: if(config_env() == :prod, do: "https://#{System.get_env("PHX_HOST")}", else: "http://localhost:4000"),
+  admin_base_url: if(config_env() == :prod, do: "https://admin.#{System.get_env("PHX_HOST")}", else: "http://localhost:4001"),
+  email: "no-reply@cmpnd.cc",
+  support_email: "hello@simonbeirouti.com",
+  ecto_repos: [Core.Repo],
+  generators: [timestamp_type: :utc_datetime]
 
 config :core, Core.Repo,
   username: "postgres",
