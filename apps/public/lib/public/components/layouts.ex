@@ -19,7 +19,7 @@ defmodule Public.Layouts do
       <Layouts.app flash={@flash}>
         <h1>Content</h1>
       </Layout.app>
-      
+
   """
   attr :flash, :map, required: true, doc: "the map of flash messages"
 
@@ -68,6 +68,45 @@ defmodule Public.Layouts do
     """
   end
 
+  def auth(assigns) do
+    current_path =
+      case assigns do
+        %{socket: %{private: %{connect_params: %{"_mounts" => 0}}}} ->
+          assigns.socket.private.connect_params["request_path"]
+
+        %{conn: conn} ->
+          conn.request_path
+
+        _ ->
+          "/"
+      end
+
+    assigns = Map.put_new(assigns, :current_path, current_path)
+
+    ~H"""
+    <div class="flex flex-col lg:flex-row h-[calc(100vh-4.3rem)]">
+      <div class="w-full lg:w-1/2 p-4">
+        {@inner_content}
+      </div>
+      <div
+        class="w-full lg:w-1/2 bg-cover bg-center"
+        style="background-image: url('/images/coffee.jpg')"
+      >
+      </div>
+    </div>
+    """
+  end
+
+  def public(assigns) do
+    ~H"""
+    <div class="min-h-[calc(100vh-4rem)]">
+      <main>
+        {@inner_content}
+      </main>
+    </div>
+    """
+  end
+
   @doc """
   Shows the flash group with standard titles and content.
 
@@ -107,40 +146,6 @@ defmodule Public.Layouts do
         {gettext("Attempting to reconnect")}
         <.icon name="hero-arrow-path" class="ml-1 size-3 motion-safe:animate-spin" />
       </.flash>
-    </div>
-    """
-  end
-
-  @doc """
-  Provides dark vs light theme toggle based on themes defined in app.css.
-
-  See <head> in root.html.heex which applies the theme before page load.
-  """
-  def theme_toggle(assigns) do
-    ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/3 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=light]_&]:left-1/3 [[data-theme=dark]_&]:left-2/3 transition-[left]" />
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "system"})}
-        class="flex p-2 cursor-pointer w-1/3"
-      >
-        <.icon name="hero-computer-desktop-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
-        class="flex p-2 cursor-pointer w-1/3"
-      >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
-        class="flex p-2 cursor-pointer w-1/3"
-      >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
     </div>
     """
   end

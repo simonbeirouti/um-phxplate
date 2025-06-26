@@ -50,13 +50,13 @@ Core acts as the central nervous system of the platform, providing:
 Each business domain is organized into contexts with clear boundaries:
 ```elixir
 # Example context structure
-Phxplate.Accounts
+Core.Accounts
 ├── User schema
 ├── UserToken schema  
 ├── User context functions
 └── Authentication logic
 
-Phxplate.Companies
+Core.Companies
 ├── Company schema
 ├── Employee schema
 ├── Company context functions
@@ -65,10 +65,10 @@ Phxplate.Companies
 
 ### Service Layer Pattern
 Complex operations are encapsulated in service modules:
-- `Phxplate.AI` - AI conversation management
-- `Phxplate.Subscriptions` - Billing and plan management
-- `Phxplate.PubSub` - Event broadcasting
-- `Phxplate.Tracking` - Activity tracking
+- `Core.AI` - AI conversation management
+- `Core.Subscriptions` - Billing and plan management
+- `Core.PubSub` - Event broadcasting
+- `Core.Tracking` - Activity tracking
 
 ### Repository Pattern
 Data access is centralized through context modules that act as repositories, providing a clean interface between business logic and data persistence.
@@ -156,13 +156,13 @@ mix test
 ### User Management
 ```elixir
 # Create a new user
-{:ok, user} = Phxplate.Accounts.register_user(%{
+{:ok, user} = Core.Accounts.register_user(%{
   email: "user@example.com",
   password: "secure_password"
 })
 
 # Authenticate user
-{:ok, user} = Phxplate.Accounts.get_user_by_email_and_password(
+{:ok, user} = Core.Accounts.get_user_by_email_and_password(
   "user@example.com", 
   "secure_password"
 )
@@ -171,14 +171,14 @@ mix test
 ### AI Integration
 ```elixir
 # Start an AI conversation
-{:ok, conversation} = Phxplate.AI.create_conversation(
+{:ok, conversation} = Core.AI.create_conversation(
   user_id, 
   "Help me with Elixir", 
   "claude-3-sonnet-20240229"
 )
 
 # Send a message
-{:ok, response} = Phxplate.AI.chat_conversation(
+{:ok, response} = Core.AI.chat_conversation(
   conversation.id, 
   "What are GenServers?", 
   user_id
@@ -188,13 +188,13 @@ mix test
 ### Company Management
 ```elixir
 # Create a company
-{:ok, company} = Phxplate.Companies.create_company(admin_user, %{
+{:ok, company} = Core.Companies.create_company(admin_user, %{
   name: "Acme Corp",
   description: "Software company"
 })
 
 # Invite an employee
-{:ok, invitation} = Phxplate.Companies.invite_employee(
+{:ok, invitation} = Core.Companies.invite_employee(
   company, 
   "employee@example.com", 
   admin_user

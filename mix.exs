@@ -32,7 +32,8 @@ defmodule Umbrella.MixProject do
         "do --app core ecto.migrate",
         "do --app core run apps/core/priv/repo/seeds.exs"
       ],
-      "ecto.reset": ["do --app core ecto.reset"],
+      "ecto.reset": ["do --app core ecto.drop", "do --app core ecto.create", "do --app core ecto.migrate", "do --app core core.seed"],
+      seed: ["do --app core core.seed"],
       "public.server": ["do --app public phx.server"],
       "admin.server": ["do --app admin phx.server"],
       run: ["public.server", "admin.server"],

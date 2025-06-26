@@ -111,3 +111,28 @@ config :admin, Admin.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :admin, dev_routes: true
+
+# Configure the mailer for development
+config :core, Core.Mailer, adapter: Swoosh.Adapters.Local
+
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
+
+# Configure Resend API key for development
+config :core, Core.Mailer,
+  api_key: System.get_env("RESEND_API_KEY")
+
+# Stripe configuration
+config :stripity_stripe,
+  api_key: System.get_env("STRIPE_SECRET_KEY"),
+  publishable_key: System.get_env("STRIPE_PUBLISHABLE_KEY")
+
+# S3 integration
+config :ex_aws,
+  bucket: System.get_env("BUCKET_NAME"),
+  access_key_id: System.get_env("AWS_ACCESS_KEY_ID"),
+  secret_access_key: System.get_env("AWS_SECRET_ACCESS_KEY"),
+  region: System.get_env("AWS_REGION")
+
+# Anthropic configuration
+config :anthropix, api_key: System.get_env("ANTHROPIC_API_KEY")

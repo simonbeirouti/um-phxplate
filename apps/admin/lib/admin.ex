@@ -19,6 +19,23 @@ defmodule Admin do
 
   def static_paths, do: ~w(assets fonts images favicon.ico robots.txt)
 
+  @doc """
+  Helper function to access Admin app configuration.
+
+  ## Examples
+
+      Admin.config([:title])
+      Admin.config([:description])
+      Admin.config([:base_url])
+  """
+  def config(key_path) when is_list(key_path) do
+    Application.get_env(:admin, hd(key_path))
+  end
+
+  def config(key) do
+    Application.get_env(:admin, key)
+  end
+
   def router do
     quote do
       use Phoenix.Router, helpers: false
