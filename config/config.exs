@@ -11,12 +11,6 @@ import Config
 
 # Configure Core app (database layer)
 config :core,
-  title: "PHXPlate",
-  description: "Your starting place for a SaaS using Phoenix and Elixir.",
-  public_base_url: if(config_env() == :prod, do: "https://#{System.get_env("PHX_HOST")}", else: "http://localhost:4000"),
-  admin_base_url: if(config_env() == :prod, do: "https://admin.#{System.get_env("PHX_HOST")}", else: "http://localhost:4001"),
-  email: "no-reply@cmpnd.cc",
-  support_email: "hello@simonbeirouti.com",
   ecto_repos: [Core.Repo],
   generators: [timestamp_type: :utc_datetime]
 
@@ -39,6 +33,11 @@ config :phoenix, :json_library, Jason
 
 # Public app configuration
 config :public,
+  title: "PHXPlate",
+  description: "Your starting place for a SaaS using Phoenix and Elixir.",
+  base_url: if(config_env() == :prod, do: "https://#{System.get_env("PHX_HOST")}", else: "http://localhost:4000"),
+  email: "no-reply@cmpnd.cc",
+  support_email: "hello@simonbeirouti.com",
   generators: [context_app: false]
 
 # Configures the public endpoint
@@ -47,13 +46,18 @@ config :public, Public.Endpoint,
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: Public.ErrorHTML, json: Public.ErrorJSON],
-    layout: false
+    layout: {Public.Layouts, :error}
   ],
   pubsub_server: Public.PubSub,
   live_view: [signing_salt: "7VKiCGMA"]
 
 # Admin app configuration
 config :admin,
+  title: "PHXPlate Admin",
+  description: "Administrative interface for PHXPlate SaaS platform.",
+  base_url: if(config_env() == :prod, do: "https://admin.#{System.get_env("PHX_HOST")}", else: "http://localhost:4001"),
+  email: "admin@cmpnd.cc",
+  support_email: "hello@simonbeirouti.com",
   generators: [context_app: false]
 
 # Configures the admin endpoint
@@ -62,7 +66,7 @@ config :admin, Admin.Endpoint,
   adapter: Bandit.PhoenixAdapter,
   render_errors: [
     formats: [html: Admin.ErrorHTML, json: Admin.ErrorJSON],
-    layout: false
+    layout: {Admin.Layouts, :error}
   ],
   pubsub_server: Admin.PubSub,
   live_view: [signing_salt: "bq5GGUXG"]

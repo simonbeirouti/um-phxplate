@@ -111,3 +111,12 @@ config :admin, Admin.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :admin, dev_routes: true
+
+# Configure the mailer for development
+config :core, Core.Mailer, adapter: Swoosh.Adapters.Local
+
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
+
+# For Swoosh Local Adapter mailbox preview
+config :swoosh, serve_mailbox: true, preview_port: 4003

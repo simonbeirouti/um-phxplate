@@ -47,12 +47,13 @@ defmodule Core.EndpointHelper do
   def invitation_url do
     case Application.get_env(:core, :env, Mix.env()) do
       :prod ->
-        Core.config([:public_base_url])
+        Application.get_env(:public, :base_url, "http://localhost:4000")
       _ ->
-        if endpoint = invitation_endpoint() do
+        endpoint = invitation_endpoint()
+        if endpoint do
           endpoint.url()
         else
-          Core.config([:public_base_url])
+          Application.get_env(:public, :base_url, "http://localhost:4000")
         end
     end
   end
@@ -64,12 +65,13 @@ defmodule Core.EndpointHelper do
   def admin_url do
     case Application.get_env(:core, :env, Mix.env()) do
       :prod ->
-        Core.config([:admin_base_url])
+        Application.get_env(:admin, :base_url, "http://localhost:4001")
       _ ->
-        if endpoint = admin_endpoint() do
+        endpoint = admin_endpoint()
+        if endpoint do
           endpoint.url()
         else
-          Core.config([:admin_base_url])
+          Application.get_env(:admin, :base_url, "http://localhost:4001")
         end
     end
   end

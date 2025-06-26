@@ -1,0 +1,82 @@
+<%!-- Header Section --%>
+<.header_section title="About Phxplate" subtitle="Built by developers, for developers" />
+
+<%!-- Hero Section --%>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+  <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+    <div>
+      <h2 class="text-3xl font-bold mb-6 text-base-content">Our Mission</h2>
+      <p class="text-lg text-base-content/70 mb-4">
+        Phxplate was built to solve a common problem: the repetitive setup of subscription-based web applications with user management, team features, and proper infrastructure.
+      </p>
+      <p class="text-lg text-base-content/70 mb-4">
+        We believe that developers should focus on building unique features that make their applications special, not reinventing authentication, subscription management, and team collaboration tools for every project.
+      </p>
+    </div>
+    <div class="rounded-xl overflow-hidden bg-base-200 h-64 flex items-center justify-center">
+      <img src="/images/coder.jpg" alt="Image of a coder" class="w-full h-full object-cover" />
+    </div>
+  </div>
+
+  <%!-- Why Phxplate Section --%>
+  <div class="mb-16">
+    <h2 class="text-3xl font-bold mb-12 text-base-content">Why Phxplate?</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="card bg-base-200 shadow-sm transition duration-300">
+        <div class="card-body">
+          <div class="rounded-full bg-base-300 w-12 h-12 flex items-center justify-center my-4">
+            <.icon name="hero-bolt" class="h-6 w-6 text-base-content" />
+          </div>
+          <h3 class="text-xl font-bold text-base-content mb-2">Built with Elixir & Phoenix</h3>
+          <p class="text-base-content/70">
+            Leveraging the reliability and scalability of Elixir and Phoenix for robust, fault-tolerant applications.
+          </p>
+        </div>
+      </div>
+      <div class="card bg-base-200 shadow-sm transition duration-300">
+        <div class="card-body">
+          <div class="rounded-full bg-base-300 w-12 h-12 flex items-center justify-center my-4">
+            <.icon name="hero-shield-check" class="h-6 w-6 text-base-content" />
+          </div>
+          <h3 class="text-xl font-bold text-base-content mb-2">Security First</h3>
+          <p class="text-base-content/70">
+            Designed with security best practices at its core, including secure authentication and authorization systems.
+          </p>
+        </div>
+      </div>
+      <div class="card bg-base-200 shadow-sm transition duration-300">
+        <div class="card-body">
+          <div class="rounded-full bg-base-300 w-12 h-12 flex items-center justify-center my-4">
+            <.icon name="hero-scale" class="h-6 w-6 text-base-content" />
+          </div>
+          <h3 class="text-xl font-bold text-base-content mb-2">Ready for Business</h3>
+          <p class="text-base-content/70">
+            Complete with subscription management, team collaboration tools, and everything you need to monetize your application.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%!-- Our Philosophy Section --%>
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold mb-12 text-base-content text-center">Our Philosophy</h2>
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="text-center">
+        <h3 class="text-xl font-bold text-base-content mb-2">Don't Reinvent the Wheel</h3>
+        <p class="text-base-content/70">
+          We've built the common components that most web applications need, so you can focus on what makes your idea unique.
+        </p>
+      </div>
+      <div class="text-center">
+        <h3 class="text-xl font-bold text-base-content mb-2">Customizable Core</h3>
+        <p class="text-base-content/70">
+          While we provide a solid foundation, everything is designed to be extended and customized to fit your specific needs.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%!-- CTA Section --%>
+<.cta />

@@ -5,6 +5,11 @@ defmodule Core.Accounts.UserNotifier do
   alias Core.Mailer
   alias Core.EndpointHelper
 
+  # Helper functions to get app configuration
+  defp app_name, do: Application.get_env(:public, :title, "PHXPlate")
+  defp app_email, do: Application.get_env(:public, :email, "no-reply@cmpnd.cc")
+  defp support_email, do: Application.get_env(:public, :support_email, "hello@simonbeirouti.com")
+
   # Common email CSS styles
   defp email_styles do
     """
@@ -268,7 +273,7 @@ defmodule Core.Accounts.UserNotifier do
       template: "confirmation_instructions",
       user: user,
       url: url,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year
     }
 
@@ -294,7 +299,7 @@ defmodule Core.Accounts.UserNotifier do
       template: "reset_password_instructions",
       user: user,
       url: url,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year
     }
 
@@ -320,7 +325,7 @@ defmodule Core.Accounts.UserNotifier do
       template: "update_email_instructions",
       user: user,
       url: url,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year
     }
 
@@ -346,7 +351,7 @@ defmodule Core.Accounts.UserNotifier do
       template: "company_invitation",
       company: company,
       invitation_url: invitation_url,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year,
       recipient_email: email
     }
@@ -356,7 +361,7 @@ defmodule Core.Accounts.UserNotifier do
 
     Hi,
 
-    You have been invited to join #{company.name} on #{Core.config([:title])}.
+    You have been invited to join #{company.name} on #{app_name()}.
 
     You can accept this invitation by visiting the URL below:
 
@@ -387,7 +392,7 @@ defmodule Core.Accounts.UserNotifier do
       subject: subject,
       message: message,
       user_id: user_id,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year,
       recipient_email: admin_email
     }
@@ -415,7 +420,7 @@ defmodule Core.Accounts.UserNotifier do
       template: "contact_form_confirmation",
       name: name,
       subject: subject,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year,
       recipient_email: email
     }
@@ -444,21 +449,21 @@ defmodule Core.Accounts.UserNotifier do
   Sends an email to the support team when a user sends a message while support is offline.
   """
   def deliver_offline_support_notification(customer_email, customer_name, message_content, session_id) do
-    app_name = Core.config([:title])
+    current_app_name = app_name()
     year = DateTime.utc_now().year
-    support_email = Core.config([:support_email])
+    current_support_email = support_email()
 
     # Create template assigns
     template_assigns = %{
       template: "offline_support_notification",
-      app_name: app_name,
+      app_name: current_app_name,
       year: year,
       customer_email: customer_email,
       customer_name: customer_name,
       message_content: message_content,
       session_id: session_id,
                 chat_url: "#{EndpointHelper.admin_url()}/dashboard/super_admin/chat",
-      recipient_email: support_email
+      recipient_email: current_support_email
     }
 
     # Plain text version
@@ -484,7 +489,7 @@ defmodule Core.Accounts.UserNotifier do
     content = render_email_template(template_assigns)
 
     # Send the email
-    deliver(support_email, "New Chat Message While Support Offline - Session ##{session_id}", text_body, content)
+    deliver(current_support_email, "New Chat Message While Support Offline - Session ##{session_id}", text_body, content)
   end
 
   @doc """
@@ -559,7 +564,7 @@ defmodule Core.Accounts.UserNotifier do
       session_id: session.id,
       started_at: session.started_at,
       ended_at: session.ended_at,
-      app_name: Core.config([:title]),
+      app_name: app_name(),
       year: DateTime.utc_now().year,
       recipient_email: email
     }
@@ -631,7 +636,7 @@ defmodule Core.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({Core.config([:title]), Core.config([:email])})
+      |> from({app_name(), app_email()})
       |> subject(subject)
       |> text_body(text_body)
 

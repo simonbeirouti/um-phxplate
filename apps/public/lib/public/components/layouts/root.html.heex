@@ -4,32 +4,70 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
-    <.live_title default="Public" suffix=" · Phoenix Framework">
-      {assigns[:page_title]}
+    <%= if assigns[:current_user] do %>
+      <meta
+        name="user-token"
+        content={Phoenix.Token.sign(Public.Endpoint, "user socket", @current_user.id)}
+      />
+    <% end %>
+    <link rel="icon" type="image/png" href={~p"/images/favicon.png"} />
+
+    <.live_title>
+      {assigns[:page_title] || Public.config(:title)}
     </.live_title>
+
+    <%= if assigns[:page_title] do %>
+      <meta name="twitter:title" content={"#{assigns[:page_title]}"} />
+      <meta property="og:title" content={"#{assigns[:page_title]}"} />
+    <% else %>
+      <meta name="twitter:title" content={Public.config(:title)} />
+      <meta property="og:title" content={Public.config(:title)} />
+    <% end %>
+
+    <%= if assigns[:page_description] do %>
+      <meta name="description" content={assigns[:page_description]} />
+      <meta name="twitter:description" content={assigns[:page_description]} />
+      <meta property="og:description" content={assigns[:page_description]} />
+    <% else %>
+      <meta name="description" content={Public.config(:description)} />
+      <meta name="twitter:description" content={Public.config(:description)} />
+      <meta property="og:description" content={Public.config(:description)} />
+    <% end %>
+
+    <meta name="twitter:image:src" content={assigns[:page_image]} />
+    <meta property="og:image" content={assigns[:page_image]} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <%= if assigns[:page_url] do %>
+      <meta property="og:url" content={"#{assigns[:page_url]}"} />
+    <% else %>
+      <meta property="og:url" content={Public.config(:base_url)} />
+    <% end %>
+
+    <meta name="twitter:site" content="@phxplate" />
+    <meta property="og:site_name" content={Public.config(:title)} />
+    <meta property="og:type" content="website" />
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>
       (() => {
         const setTheme = (theme) => {
-          if (theme === "system") {
-            localStorage.removeItem("phx:theme");
-            document.documentElement.removeAttribute("data-theme");
-          } else {
-            localStorage.setItem("phx:theme", theme);
-            document.documentElement.setAttribute("data-theme", theme);
-          }
+          localStorage.setItem("phx:theme", theme);
+          document.documentElement.setAttribute("data-theme", theme);
         };
         if (!document.documentElement.hasAttribute("data-theme")) {
-          setTheme(localStorage.getItem("phx:theme") || "system");
+          setTheme(localStorage.getItem("phx:theme") || "light");
         }
-        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "system"));
+        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "light"));
         window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
       })();
     </script>
   </head>
   <body>
+    <Public.Components.NavComponent.nav current_user={@current_user} current_path={@current_path} />
     {@inner_content}
   </body>
 </html>
