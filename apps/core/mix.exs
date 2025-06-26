@@ -12,6 +12,7 @@ defmodule Core.MixProject do
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      aliases: aliases(),
       listeners: [Phoenix.CodeReloader]
     ]
   end
@@ -20,6 +21,14 @@ defmodule Core.MixProject do
     [
       extra_applications: [:logger],
       mod: {Core.Application, []}
+    ]
+  end
+
+  defp aliases do
+    [
+      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
 
