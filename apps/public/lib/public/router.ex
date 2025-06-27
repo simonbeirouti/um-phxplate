@@ -1,7 +1,7 @@
 defmodule Public.Router do
   use Public, :router
 
-  import Public.UserAuth
+  import Core.Auth
   import Phoenix.LiveView.Router
 
   pipeline :browser do
@@ -29,7 +29,7 @@ defmodule Public.Router do
   Ensures the current user has at least basic user privileges.
   """
   pipeline :basic do
-    plug Public.Authorization, :basic
+    plug Core.Authorization, :basic
   end
 
   @doc """
@@ -38,7 +38,7 @@ defmodule Public.Router do
   Ensures the current user has admin privileges.
   """
   pipeline :admin do
-    plug Public.Authorization, :admin
+    plug Core.Authorization, :admin
   end
 
   scope "/", Public do
@@ -48,7 +48,7 @@ defmodule Public.Router do
     get "/about", PageController, :about
 
     live_session :public,
-        on_mount: [{Public.UserAuth, :mount_current_user}],
+        on_mount: [{Core.Auth, :mount_current_user}],
         layout: {Public.Layouts, :public} do
         live "/contact", ContactLive, :index
         live "/pricing", PricingLive, :index
@@ -82,7 +82,7 @@ defmodule Public.Router do
 
     live_session :redirect_if_user_is_authenticated,
       layout: {Public.Layouts, :auth},
-      on_mount: [{Public.UserAuth, :redirect_if_user_is_authenticated}] do
+      on_mount: [{Core.Auth, :redirect_if_user_is_authenticated}] do
       live "/register", UserRegistrationLive, :new
       live "/login", UserLoginLive, :new
       live "/reset-password", UserForgotPasswordLive, :new
@@ -100,7 +100,7 @@ defmodule Public.Router do
 
     live_session :current_user,
       layout: {Public.Layouts, :auth},
-      on_mount: [{Public.UserAuth, :mount_current_user}] do
+      on_mount: [{Core.Auth, :mount_current_user}] do
       live "/confirm/:token", UserConfirmationLive, :edit
       live "/confirm", UserConfirmationInstructionsLive, :new
     end
@@ -113,40 +113,63 @@ defmodule Public.Router do
     live_session :onboarding,
       layout: {Public.Layouts, :auth},
       on_mount: [
-        {Public.UserAuth, :ensure_authenticated}
+        {Core.Auth, :ensure_authenticated}
       ] do
       live "/", Onboarding.ProfileLive, :index
     end
   end
 
   # Dashboard routes with role-based access control
-  # TODO: Implement dashboard LiveView modules
-  # scope "/dashboard", Public do
-  #   pipe_through [:browser, :require_authenticated_user]
-  #   live_session :dashboard,
-  #     layout: {Public.Layouts, :app},
-  #     on_mount: [
-  #       {Public.UserAuth, :ensure_authenticated},
-  #       {Public.UserAuth, :ensure_proper_role},
-  #       {Public.Live.Hooks.LayoutHooks, :default}
-  #     ] do
-  #     live "/", DashboardLive, :index
-  #     live "/account", Dashboard.User.UserAccountLive, :index
-  #     live "/account/confirm_email/:token", Dashboard.User.UserAccountLive, :confirm_email
-  #     live "/invites", Dashboard.User.InvitesLive, :index
-  #     live "/invites/:token", Dashboard.User.InvitesLive, :accept
+  scope "/dashboard", Public do
+    pipe_through [:browser, :require_authenticated_user]
+    live_session :dashboard,
+      layout: {Public.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :ensure_authenticated},
+        {Core.Auth, :ensure_proper_role},
+        {Public.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/", DashboardLive, :index
+      live "/account", Dashboard.UserAccountLive, :index
+      live "/account/confirm_email/:token", Dashboard.UserAccountLive, :confirm_email
+      live "/invites", Dashboard.InvitesLive, :index
+      live "/invites/:token", Dashboard.InvitesLive, :accept
+    end
+  end
 
-  #     pipe_through [:basic]
-  #     live "/basic", Dashboard.Basic.BasicLive, :index
-  #     live "/basic/bookmarks", Dashboard.Basic.BookmarksLive, :index
-  #     live "/companies/:id", Dashboard.Company.CompanyViewLive, :index
+  # Basic user routes
+  scope "/dashboard", Public do
+    pipe_through [:browser, :require_authenticated_user, :basic]
 
-  #     pipe_through [:admin]
-  #     live "/admin", Dashboard.Admin.AdminLive, :index
-  #     live "/admin/companies", Dashboard.Admin.CompanyLive, :index
-  #     live "/admin/companies/:id", Dashboard.Admin.CompanyShowLive, :index
-  #   end
-  # end
+    live_session :dashboard_basic,
+      layout: {Public.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :ensure_authenticated},
+        {Core.Auth, :ensure_proper_role},
+        {Public.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/basic", Dashboard.Basic.BasicLive, :index
+      live "/basic/bookmarks", Dashboard.Basic.BookmarksLive, :index
+      live "/companies/:id", Dashboard.Company.CompanyViewLive, :index
+    end
+  end
+
+  # Admin user routes
+  scope "/dashboard", Public do
+    pipe_through [:browser, :require_authenticated_user, :admin]
+
+    live_session :dashboard_admin,
+      layout: {Public.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :ensure_authenticated},
+        {Core.Auth, :ensure_proper_role},
+        {Public.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/admin", Dashboard.Admin.AdminLive, :index
+      live "/admin/companies", Dashboard.Admin.CompanyLive, :index
+      live "/admin/companies/:id", Dashboard.Admin.CompanyShowLive, :index
+    end
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:public, :dev_routes) do

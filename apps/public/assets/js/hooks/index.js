@@ -1,5 +1,7 @@
-import NavMenu from "./nav_menu"
+import NavMenu from "./nav_menu";
+import Flash from "./flash";
 
 export default {
-  NavMenu
-}
+  NavMenu,
+  Flash
+};

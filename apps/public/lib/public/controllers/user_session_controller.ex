@@ -2,7 +2,7 @@ defmodule Public.UserSessionController do
   use Public, :controller
 
   alias Core.Accounts
-  alias Public.UserAuth
+  alias Core.Auth
 
   def create(conn, %{"_action" => "registered"} = params) do
     create(conn, params, "Account created successfully!")
@@ -44,16 +44,23 @@ defmodule Public.UserSessionController do
 
       # For users needing onboarding, we need to check if they need to be redirected
       # with plan_id as a query parameter
-      if !Core.Accounts.onboarding_completed?(user) do
-        if selected_plan_id do
-          # Explicitly set the return path with plan_id if user needs onboarding
-          ^conn = put_session(conn, :user_return_to, ~p"/onboarding?plan_id=#{selected_plan_id}")
+      conn =
+        if !Core.Accounts.onboarding_completed?(user) do
+          if selected_plan_id do
+            # Explicitly set the return path with plan_id if user needs onboarding
+            put_session(conn, :user_return_to, ~p"/onboarding?plan_id=#{selected_plan_id}")
+          else
+            # If no plan is selected, just let it go to the default onboarding
+            conn
+          end
+        else
+          # If onboarding is completed, redirect to the dashboard
+          put_session(conn, :user_return_to, ~p"/dashboard")
         end
-      end
 
       conn
       |> put_flash(:info, info)
-      |> UserAuth.log_in_user(user, user_params)
+      |> Auth.log_in_user(user, user_params)
     else
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
       conn
@@ -74,6 +81,6 @@ defmodule Public.UserSessionController do
 
     conn
     |> put_flash(:info, "Logged out successfully.")
-    |> UserAuth.log_out_user()
+    |> Auth.log_out_user()
   end
 end

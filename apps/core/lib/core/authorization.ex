@@ -1,6 +1,6 @@
-defmodule Public.Authorization do
+defmodule Core.Authorization do
   @moduledoc """
-  Provides authorization helpers for role-based access control.
+  Centralized authorization helpers for role-based access control.
 
   This module implements plugs and helper functions for enforcing
   role-based access control throughout the application. It supports
@@ -64,10 +64,13 @@ defmodule Public.Authorization do
       iex> authorized?(user_with_basic_role, :admin)
       false
   """
+  def authorized?(nil, _role), do: false
+
   def authorized?(user, role) do
     case role do
-      :basic -> user.role in [:basic, :admin]
-      :admin -> user.role in [:admin]
+      :basic -> user.role in [:basic, :admin, :super_admin]
+      :admin -> user.role in [:admin, :super_admin]
+      :super_admin -> user.role == :super_admin
       _ -> false
     end
   end
@@ -92,15 +95,20 @@ defmodule Public.Authorization do
             if company.owner_id == conn.assigns.current_user.id do
               conn
             else
+              # Determine redirect path based on app context
+              redirect_path = get_company_redirect_path(conn)
+
               conn
               |> put_flash(:error, "You don't have access to this company")
-              |> redirect(to: "/dashboard/admin/companies")
+              |> redirect(to: redirect_path)
               |> halt()
             end
           _ ->
+            redirect_path = get_company_redirect_path(conn)
+
             conn
             |> put_flash(:error, "Invalid company ID")
-            |> redirect(to: "/dashboard/admin/companies")
+            |> redirect(to: redirect_path)
             |> halt()
         end
       _ -> conn
@@ -144,17 +152,39 @@ defmodule Public.Authorization do
     case call(conn, required_role) do
       {:ok, _user} -> conn
       {:error, :unauthorized} ->
+        error_view = get_error_view(conn)
+
         conn
         |> put_status(:unauthorized)
-        |> put_view(Public.ErrorHTML)
+        |> put_view(error_view)
         |> render(:"401")
         |> halt()
       {:error, :forbidden} ->
+        error_view = get_error_view(conn)
+
         conn
         |> put_status(:forbidden)
-        |> put_view(Public.ErrorHTML)
+        |> put_view(error_view)
         |> render(:"403")
         |> halt()
+    end
+  end
+
+  # Private helper functions
+
+  defp get_company_redirect_path(conn) do
+    case Core.Auth.get_app_config(conn) do
+      {:ok, :admin, _config} -> "/dashboard/admin/companies"
+      {:ok, :public, _config} -> "/dashboard/admin/companies"
+      _ -> "/dashboard"
+    end
+  end
+
+  defp get_error_view(conn) do
+    case Core.Auth.get_app_config(conn) do
+      {:ok, :admin, _config} -> Admin.ErrorHTML
+      {:ok, :public, _config} -> Public.ErrorHTML
+      _ -> Public.ErrorHTML  # Default fallback
     end
   end
 end

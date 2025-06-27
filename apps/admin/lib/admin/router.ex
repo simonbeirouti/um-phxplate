@@ -1,6 +1,8 @@
 defmodule Admin.Router do
   use Admin, :router
 
+  import Core.Auth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,16 +10,40 @@ defmodule Admin.Router do
     plug :put_root_layout, html: {Admin.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
+  # Routes for unauthenticated users
   scope "/", Admin do
-    pipe_through :browser
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-    get "/", PageController, :home
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{Core.Auth, :redirect_if_user_is_authenticated}] do
+      live "/", UserLoginLive, :new
+      live "/reset-password", UserForgotPasswordLive, :new
+      live "/reset-password/:token", UserResetPasswordLive, :edit
+    end
+
+    post "/login", UserSessionController, :create
+  end
+
+  # Routes for authenticated users
+  scope "/", Admin do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [
+        {Core.Auth, :mount_current_user},
+        {Core.Auth, :ensure_authenticated}
+      ] do
+      live "/dashboard", DashboardLive, :index
+    end
+
+    delete "/logout", UserSessionController, :delete
   end
 
   # Other scopes may use custom stacks.

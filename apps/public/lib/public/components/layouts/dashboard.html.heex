@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" class="[scrollbar-gutter:stable]">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <.live_title suffix=" · Phoenix Umbrella">
+      <%= assigns[:page_title] || "Dashboard" %>
+    </.live_title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="bg-base-100 antialiased">
+    <.flash_group flash={@flash} />
+    <.live_component 
+      module={Public.Dashboard.LayoutComponent}
+      id="dashboard-layout"
+      current_user={assigns[:current_user]}
+      dashboard_nav={assigns[:dashboard_nav]}
+      current_path={assigns[:current_path]}
+    >
+      <%= @inner_content %>
+    </.live_component>
+  </body>
+</html> 
