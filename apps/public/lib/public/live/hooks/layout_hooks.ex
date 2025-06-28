@@ -10,8 +10,6 @@ defmodule Public.Live.Hooks.LayoutHooks do
   import Phoenix.Component
   import Phoenix.LiveView
 
-  alias Core.Repo
-
   @doc """
   Default on_mount hook for dashboard layouts.
 
@@ -60,42 +58,70 @@ defmodule Public.Live.Hooks.LayoutHooks do
   Returns the navigation items for the dashboard based on user permissions.
   """
   defp dashboard_navigation_items(user) do
-    base_items = [
+    dashboard_items = [
       %{
-        label: "Dashboard",
-        path: "/dashboard",
-        icon: "hero-home",
-        active_paths: ["/dashboard"]
-      },
+        title: "Dashboard",
+        items: [
+          %{
+            label: "Dashboard",
+            path: "/dashboard",
+            icon: "hero-home",
+            active_paths: ["/dashboard"]
+          }
+        ]
+      }
+    ]
+
+    account_items = [
       %{
-        label: "Account",
-        path: "/dashboard/account",
-        icon: "hero-user-circle",
-        active_paths: ["/dashboard/account"]
-      },
-      %{
-        label: "Invites",
-        path: "/dashboard/invites",
-        icon: "hero-user-plus",
-        active_paths: ["/dashboard/invites"]
+        title: "Account",
+        items: [
+          %{
+            label: "Invites",
+            path: "/dashboard/invites",
+            icon: "hero-user-plus",
+            active_paths: ["/dashboard/invites"]
+          },
+          %{
+            label: "Account",
+            path: "/dashboard/account",
+            icon: "hero-user-circle",
+            active_paths: ["/dashboard/account"]
+          }
+        ]
       }
     ]
 
     # Add role-based navigation items
     role_based_items = get_role_based_navigation(user)
 
-    base_items ++ role_based_items
+    dashboard_items ++ role_based_items ++ account_items
   end
 
   @doc """
   Returns additional navigation items based on user role.
   """
   defp get_role_based_navigation(user) do
-    case user.role do
-      :admin ->
-        [
+    basic_items = [
+      %{
+        title: "Basic Features",
+        items: [
           %{
-            label: "Admin",
+            label: "Bookmarks",
+            path: "/dashboard/basic/bookmarks",
+            icon: "hero-bookmark",
+            active_paths: ["/dashboard/basic/bookmarks"]
+          }
+        ]
+      }
+    ]
+
+    admin_items = [
+      %{
+        title: "Admin",
+        items: [
+          %{
+            label: "Admin Dashboard",
             path: "/dashboard/admin",
             icon: "hero-cog-6-tooth",
             active_paths: ["/dashboard/admin"]
@@ -107,25 +133,13 @@ defmodule Public.Live.Hooks.LayoutHooks do
             active_paths: ["/dashboard/admin/companies"]
           }
         ]
+      }
+    ]
 
-      :basic ->
-        [
-          %{
-            label: "Basic Features",
-            path: "/dashboard/basic",
-            icon: "hero-squares-2x2",
-            active_paths: ["/dashboard/basic"]
-          },
-          %{
-            label: "Bookmarks",
-            path: "/dashboard/basic/bookmarks",
-            icon: "hero-bookmark",
-            active_paths: ["/dashboard/basic/bookmarks"]
-          }
-        ]
-
-      _ ->
-        []
+    case user.role do
+      :basic -> basic_items
+      :admin -> basic_items ++ admin_items
+      _ -> []
     end
   end
 

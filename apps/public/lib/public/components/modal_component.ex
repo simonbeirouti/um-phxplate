@@ -19,12 +19,12 @@ defmodule Public.Components.ModalComponent do
         <div
           id={@id}
           class="modal modal-open"
-          phx-window-keydown="close"
+          phx-window-keydown={JS.push("close") |> JS.hide(to: "##{@id}")}
           phx-key="escape"
-          phx-target={@id}
+          phx-target={"##{@id}"}
         >
           <div class="modal-box">
-            <form phx-submit="close">
+            <form phx-submit={JS.push("close") |> JS.hide(to: "##{@id}")} phx-target={"##{@id}"}>
               <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
             <h3 class="font-bold text-lg"><%= @title %></h3>
@@ -32,7 +32,7 @@ defmodule Public.Components.ModalComponent do
               <%= render_slot(@inner_block) %>
             </div>
           </div>
-          <form phx-submit="close" class="modal-backdrop">
+          <form phx-submit={JS.push("close") |> JS.hide(to: "##{@id}")} class="modal-backdrop" phx-target={"##{@id}"}>
             <button type="submit">close</button>
           </form>
         </div>

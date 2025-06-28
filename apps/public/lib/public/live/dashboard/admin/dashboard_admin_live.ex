@@ -44,6 +44,8 @@ defmodule Public.Dashboard.Admin.AdminLive do
       Subscriptions.get_user_subscription(current_user.id)
     end
 
+    can_create_company = Subscriptions.can_create_company?(current_user)
+
     {:ok,
      socket
      |> PageMeta.assign_metadata(
@@ -55,7 +57,8 @@ defmodule Public.Dashboard.Admin.AdminLive do
        companies: companies,
        employee_count: employee_count,
        subscription: subscription,
-       show_create_company_modal: false
+       show_create_company_modal: false,
+       can_create_company: can_create_company
      )}
   end
 
@@ -161,7 +164,7 @@ defmodule Public.Dashboard.Admin.AdminLive do
     case handle_create_company(socket, params) do
       {:noreply, socket_after_create} ->
         # On success (no error flash), we close the modal by updating the assign.
-        if Phoenix.LiveView.get_flash(socket_after_create, :error) == nil do
+        if get_in(socket_after_create.assigns, [:flash, :error]) == nil do
           {:noreply, assign(socket_after_create, :show_create_company_modal, false)}
         else
           {:noreply, socket_after_create}
@@ -221,12 +224,14 @@ defmodule Public.Dashboard.Admin.AdminLive do
       <div class="mt-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-base-content">Your Companies</h2>
-          <button class="btn btn-primary" phx-click="show_create_modal">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Create Company
-          </button>
+          <%= if @can_create_company do %>
+            <button class="btn btn-primary" phx-click="show_create_modal">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Create Company
+            </button>
+          <% end %>
         </div>
 
         <%= if Enum.empty?(@companies) do %>
@@ -316,8 +321,7 @@ defmodule Public.Dashboard.Admin.AdminLive do
               name="description"
               placeholder="Company description"
               class="textarea w-full textarea-bordered"
-            >
-            </textarea>
+            ></textarea>
           </fieldset>
           <div class="flex flex-col w-full space-y-2">
             <button type="submit" class="btn btn-primary w-full" form="create_company_form">

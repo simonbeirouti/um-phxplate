@@ -122,6 +122,7 @@ defmodule Public.Router do
   # Dashboard routes with role-based access control
   scope "/dashboard", Public do
     pipe_through [:browser, :require_authenticated_user]
+
     live_session :dashboard,
       layout: {Public.Layouts, :dashboard},
       on_mount: [
@@ -134,40 +135,24 @@ defmodule Public.Router do
       live "/account/confirm_email/:token", Dashboard.UserAccountLive, :confirm_email
       live "/invites", Dashboard.InvitesLive, :index
       live "/invites/:token", Dashboard.InvitesLive, :accept
-    end
-  end
 
-  # Basic user routes
-  scope "/dashboard", Public do
-    pipe_through [:browser, :require_authenticated_user, :basic]
+      # Basic user routes
+      scope "/" do
+        pipe_through [:basic]
 
-    live_session :dashboard_basic,
-      layout: {Public.Layouts, :dashboard},
-      on_mount: [
-        {Core.Auth, :ensure_authenticated},
-        {Core.Auth, :ensure_proper_role},
-        {Public.Live.Hooks.LayoutHooks, :default}
-      ] do
-      live "/basic", Dashboard.Basic.BasicLive, :index
-      live "/basic/bookmarks", Dashboard.Basic.BookmarksLive, :index
-      live "/companies/:id", Dashboard.Company.CompanyViewLive, :index
-    end
-  end
+        live "/basic", Dashboard.Basic.BasicLive, :index
+        live "/basic/bookmarks", Dashboard.Basic.BookmarksLive, :index
+        live "/companies/:id", Dashboard.Company.CompanyViewLive, :index
+      end
 
-  # Admin user routes
-  scope "/dashboard", Public do
-    pipe_through [:browser, :require_authenticated_user, :admin]
+      # Admin user routes
+      scope "/" do
+        pipe_through [:admin]
 
-    live_session :dashboard_admin,
-      layout: {Public.Layouts, :dashboard},
-      on_mount: [
-        {Core.Auth, :ensure_authenticated},
-        {Core.Auth, :ensure_proper_role},
-        {Public.Live.Hooks.LayoutHooks, :default}
-      ] do
-      live "/admin", Dashboard.Admin.AdminLive, :index
-      live "/admin/companies", Dashboard.Admin.CompanyLive, :index
-      live "/admin/companies/:id", Dashboard.Admin.CompanyShowLive, :index
+        live "/admin", Dashboard.Admin.AdminLive, :index
+        live "/admin/companies", Dashboard.Admin.CompanyLive, :index
+        live "/admin/companies/:id", Dashboard.Admin.CompanyShowLive, :index
+      end
     end
   end
 

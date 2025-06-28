@@ -16,81 +16,30 @@ defmodule Public.Dashboard.LayoutComponent do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="min-h-screen">
-      <!-- Dashboard Navigation -->
-      <div class="sticky top-0 z-40 bg-base-100 border-b border-base-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="navbar">
-            <div class="navbar-start">
-              <div class="dropdown">
-                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                  <.icon name="hero-bars-3" class="h-5 w-5" />
-                </div>
-                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                  <%= for item <- @dashboard_nav || [] do %>
-                    <li>
-                      <.link
-                        navigate={item.path}
-                        class={["flex items-center gap-2", if(String.starts_with?(@current_path || "", item.path), do: "active", else: "")]}
-                      >
-                        <.icon name={item.icon} class="h-4 w-4" />
-                        <%= item.label %>
-                      </.link>
-                    </li>
-                  <% end %>
-                </ul>
-              </div>
-              <.link navigate="/dashboard" class="btn btn-ghost text-xl">Dashboard</.link>
-            </div>
+    <div class="size-full">
+      <div class="flex">
+        <.live_component
+          module={Public.Dashboard.SidebarComponent}
+          id="sidebar"
+          dashboard_nav={@dashboard_nav}
+          current_path={@current_path}
+          dashboard_user={@dashboard_user}
+        />
 
-            <div class="navbar-center hidden lg:flex">
-              <ul class="menu menu-horizontal px-1">
-                <%= for item <- @dashboard_nav || [] do %>
-                  <li>
-                    <.link
-                      navigate={item.path}
-                      class={["flex items-center gap-2", if(String.starts_with?(@current_path || "", item.path), do: "active", else: "")]}
-                    >
-                      <.icon name={item.icon} class="h-4 w-4" />
-                      <%= item.label %>
-                    </.link>
-                  </li>
-                <% end %>
-              </ul>
-            </div>
+        <div class="flex h-screen min-w-0 grow flex-col overflow-auto">
+          <.live_component
+            module={Public.Dashboard.TopbarComponent}
+            id="topbar"
+            dashboard_user={@dashboard_user}
+          />
 
-            <div class="navbar-end">
-              <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                  <div class="w-10 rounded-full">
-                    <%= if @current_user && @current_user.profile && @current_user.profile.avatar_url do %>
-                      <img alt="User avatar" src={@current_user.profile.avatar_url} />
-                    <% else %>
-                      <div class="bg-primary text-primary-content w-10 h-10 rounded-full flex items-center justify-center">
-                        <.icon name="hero-user" class="h-5 w-5" />
-                      </div>
-                    <% end %>
-                  </div>
-                </div>
-                <ul tabindex="0" class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                  <li>
-                    <.link navigate="/dashboard/account" class="justify-between">
-                      Profile
-                      <span class="badge">Settings</span>
-                    </.link>
-                  </li>
-                  <li><.link href="/logout" method="delete">Logout</.link></li>
-                </ul>
-              </div>
-            </div>
+          <!--  Start: Layout - Content -->
+          <div id="layout-content" class="p-6">
+            {render_slot(@inner_block)}
           </div>
         </div>
+        <.live_component module={Public.Dashboard.SearchModalComponent} id="search-modal" />
       </div>
-
-      <!-- Main Content Area -->
-      <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <%= render_slot(@inner_block) %>
-      </main>
     </div>
     """
   end

@@ -4,23 +4,58 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content={get_csrf_token()} />
+    <script>
+      if (
+        localStorage.getItem("phx:sidebar") === "open"
+      ) {
+        document.documentElement.classList.add("sidebar-open");
+      } else {
+        document.documentElement.classList.remove("sidebar-open");
+      }
+    </script>
     <.live_title suffix=" · Phoenix Umbrella">
       <%= assigns[:page_title] || "Dashboard" %>
     </.live_title>
-    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
-    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/4.3.0/apexcharts.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/4.3.0/apexcharts.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplebar/6.2.7/simplebar.min.js">
+    </script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/simplebar/6.2.7/simplebar.css"
+    />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
+    </script>
+    <script>
+      (() => {
+        const setTheme = (theme) => {
+          localStorage.setItem("phx:theme", theme);
+          document.documentElement.setAttribute("data-theme", theme);
+        };
+        if (!document.documentElement.hasAttribute("data-theme")) {
+          setTheme(localStorage.getItem("phx:theme") || "light");
+        }
+        window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "light"));
+        window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+      })();
     </script>
   </head>
   <body class="bg-base-100 antialiased">
     <.flash_group flash={@flash} />
-    <.live_component 
+    <.live_component
       module={Public.Dashboard.LayoutComponent}
       id="dashboard-layout"
       current_user={assigns[:current_user]}
       dashboard_nav={assigns[:dashboard_nav]}
       current_path={assigns[:current_path]}
+      dashboard_user={assigns[:dashboard_user]}
     >
       <%= @inner_content %>
     </.live_component>
   </body>
-</html> 
+</html>

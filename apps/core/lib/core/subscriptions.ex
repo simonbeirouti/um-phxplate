@@ -21,6 +21,7 @@ defmodule Core.Subscriptions do
   alias Core.Subscriptions.{Subscription, Plan, Purchase}
   alias Core.Accounts.User
   alias Core.Accounts
+  alias Core.Companies
   alias Core.PubSub.DataSync
   alias Core.PlatformSetting
   require Logger
@@ -1751,6 +1752,65 @@ defmodule Core.Subscriptions do
   end
   defp normalize_keys_to_strings(value), do: value
 
+  @doc """
+  Checks if a user can create a new company based on their subscription plan.
 
+  ## Parameters
+    - user: The user to check
 
+  ## Returns
+    - `true` if the user can create a new company
+    - `false` if the user has reached their company limit
+  """
+  def can_create_company?(%User{} = user) do
+    limit = get_company_limit_for_user(user)
+    current_count = Companies.count_companies_by_owner(user.id)
+
+    case limit do
+      :unlimited -> true
+      limit when is_integer(limit) -> current_count < limit
+      _ -> false
+    end
+  end
+
+  @doc """
+  Gets the company creation limit for a user based on their subscription.
+
+  ## Parameters
+    - user: The user whose company limit to retrieve
+
+  ## Returns
+    - The company limit as an integer
+    - `:unlimited` if there is no limit
+  """
+  def get_company_limit_for_user(%User{} = user) do
+    # Super admins have unlimited access
+    if user.role == :super_admin do
+      :unlimited
+    else
+      case get_user_subscription(user.id) do
+        nil ->
+          # Default limit for users without a subscription (e.g., free plan)
+          # You might want to make this configurable
+          1
+
+        %Subscription{plan: %Plan{features: features}} ->
+          # "projects" is used for companies in the plan features
+          case Map.get(features, "projects", "0") do
+            "Unlimited" ->
+              :unlimited
+            limit when is_integer(limit) ->
+              limit
+            limit_str when is_binary(limit_str) ->
+              case Integer.parse(limit_str) do
+                {limit, ""} -> limit
+                _ -> 0 # Default to 0 if parsing fails
+              end
+            _ ->
+              0 # Default for any other type
+          end
+        _ -> 0
+      end
+    end
+  end
 end

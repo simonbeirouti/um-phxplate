@@ -39,7 +39,7 @@ defmodule Public.Dashboard.Admin.CompanyHelpers do
       owner_id: current_user.id
     }
 
-    case Companies.create_company(company_params) do
+    case Companies.create_company(company_params, current_user) do
       {:ok, company} ->
         {:noreply,
          socket
@@ -47,11 +47,17 @@ defmodule Public.Dashboard.Admin.CompanyHelpers do
          |> put_flash(:info, "Company created successfully!")
          |> push_event("hide-modal", %{id: "create-company-dialog"})}
 
+      {:error, :limit_reached} ->
+        {:noreply,
+         socket
+         |> put_flash(:error, "You have reached the maximum number of companies for your plan.")}
+
       {:error, changeset} ->
-        error_message = case changeset.errors do
-          [{field, {msg, _}} | _] -> "#{Phoenix.Naming.humanize(field)} #{msg}"
-          _ -> "Failed to create company. Please try again."
-        end
+        error_message =
+          case changeset.errors do
+            [{field, {msg, _}} | _] -> "#{Phoenix.Naming.humanize(field)} #{msg}"
+            _ -> "Failed to create company. Please try again."
+          end
 
         {:noreply,
          socket

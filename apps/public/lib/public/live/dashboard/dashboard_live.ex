@@ -7,6 +7,9 @@ defmodule Public.DashboardLive do
   like profile management, companies, and bookmarks.
   """
   use Public, :live_view
+
+  on_mount Public.Live.Hooks.LayoutHooks
+
   alias Public.PageMeta
   alias Core.Accounts
   alias Core.Companies

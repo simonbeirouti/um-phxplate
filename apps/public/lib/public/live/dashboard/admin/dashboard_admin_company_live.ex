@@ -36,6 +36,8 @@ defmodule Public.Dashboard.Admin.CompanyLive do
       Subscriptions.get_user_subscription(current_user.id)
     end
 
+    can_create_company = Subscriptions.can_create_company?(current_user)
+
     {:ok,
      socket
      |> PageMeta.assign_metadata(
@@ -45,7 +47,9 @@ defmodule Public.Dashboard.Admin.CompanyLive do
      )
      |> assign(
        companies: companies,
-       subscription: subscription
+       subscription: subscription,
+       can_create_company: can_create_company,
+       show_create_company_modal: false
      )}
   end
 
@@ -84,12 +88,20 @@ defmodule Public.Dashboard.Admin.CompanyLive do
      end)}
   end
 
+  @impl true
+  def handle_event("show_create_modal", _params, socket) do
+    {:noreply, assign(socket, :show_create_company_modal, true)}
+  end
+
+  def handle_event("close", _params, socket) do
+    {:noreply, assign(socket, :show_create_company_modal, false)}
+  end
+
   def handle_event("create_company", params, socket) do
     case handle_create_company(socket, params) do
       {:noreply, socket_after_create} ->
-        if Phoenix.LiveView.get_flash(socket_after_create, :error) == nil do
-          {:noreply,
-           Phoenix.LiveView.push_exec(socket_after_create, "close", to: "#create_company_modal")}
+        if get_in(socket_after_create.assigns, [:flash, :error]) == nil do
+          {:noreply, assign(socket_after_create, :show_create_company_modal, false)}
         else
           {:noreply, socket_after_create}
         end
@@ -111,15 +123,14 @@ defmodule Public.Dashboard.Admin.CompanyLive do
       <div class="mt-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-base-content">Your Companies</h2>
-          <button
-            class="btn btn-primary"
-            onclick="create_company_modal.showModal()"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            Create Company
-          </button>
+          <%= if @can_create_company do %>
+            <button class="btn btn-primary" phx-click="show_create_modal">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 mr-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Create Company
+            </button>
+          <% end %>
         </div>
 
         <%= if Enum.empty?(@companies) do %>
@@ -166,30 +177,61 @@ defmodule Public.Dashboard.Admin.CompanyLive do
         <% end %>
       </div>
 
-      <.modal id="create_company_modal" title="Create New Company">
-        <:content>
-          <form phx-submit="create_company" id="create_company_form" class="space-y-4">
-            <fieldset class="space-y-4 form-control w-full">
-              <input type="text" name="name" placeholder="Enter company name" class="input w-full input-bordered" required />
-              <input type="email" name="email" placeholder="company@example.com" class="input w-full input-bordered" />
-              <input type="tel" name="phone" placeholder="123-456-7890" class="input w-full input-bordered" />
-              <input type="url" name="website" placeholder="https://company.com" class="input w-full input-bordered" />
-              <input type="text" name="address" placeholder="123 Main St, City, State" class="input w-full input-bordered" />
-              <textarea name="description" placeholder="Company description" class="textarea w-full textarea-bordered"></textarea>
-            </fieldset>
-          </form>
-        </:content>
-        <:footer>
+      <.live_component
+        module={Public.Components.ModalComponent}
+        id="create_company_modal"
+        title="Create New Company"
+        show={@show_create_company_modal}
+      >
+        <form phx-submit="create_company" id="create_company_form" class="space-y-4">
+          <fieldset class="space-y-4 form-control w-full">
+            <input
+              type="text"
+              name="name"
+              placeholder="Enter company name"
+              class="input w-full input-bordered"
+              required
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="company@example.com"
+              class="input w-full input-bordered"
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="123-456-7890"
+              class="input w-full input-bordered"
+            />
+            <input
+              type="url"
+              name="website"
+              placeholder="https://company.com"
+              class="input w-full input-bordered"
+            />
+            <input
+              type="text"
+              name="address"
+              placeholder="123 Main St, City, State"
+              class="input w-full input-bordered"
+            />
+            <textarea
+              name="description"
+              placeholder="Company description"
+              class="textarea w-full textarea-bordered"
+            ></textarea>
+          </fieldset>
           <div class="flex flex-col w-full space-y-2">
             <button type="submit" class="btn btn-primary w-full" form="create_company_form">
               Create Company
             </button>
-            <form method="dialog" class="w-full">
-              <button class="btn w-full">Cancel</button>
-            </form>
+            <button type="button" class="btn w-full" phx-click="close">
+              Cancel
+            </button>
           </div>
-        </:footer>
-      </.modal>
+        </form>
+      </.live_component>
     </div>
     """
   end
