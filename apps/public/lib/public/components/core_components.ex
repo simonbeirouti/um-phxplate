@@ -131,27 +131,20 @@ defmodule Public.CoreComponents do
   @doc """
   Provides dark vs light theme toggle based on themes defined in app.css.
 
+  Shows a sun icon for light theme and moon icon for dark theme.
+  Clicking the icon toggles between light and dark themes.
   See <head> in root.html.heex which applies the theme before page load.
   """
   def theme_toggle(assigns) do
     ~H"""
-    <div class="card relative flex flex-row items-center border-2 border-base-300 bg-base-300 rounded-full">
-      <div class="absolute w-1/2 h-full rounded-full border-1 border-base-200 bg-base-100 brightness-200 left-0 [[data-theme=dark]_&]:left-1/2 transition-[left]" />
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "light"})}
-        class="flex p-2 cursor-pointer w-1/2"
-      >
-        <.icon name="hero-sun-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-
-      <button
-        phx-click={JS.dispatch("phx:set-theme", detail: %{theme: "dark"})}
-        class="flex p-2 cursor-pointer w-1/2"
-      >
-        <.icon name="hero-moon-micro" class="size-4 opacity-75 hover:opacity-100" />
-      </button>
-    </div>
+    <button
+      onclick="window.toggleTheme && window.toggleTheme()"
+      class="flex items-center justify-center p-2 rounded-full border-2 border-base-300 bg-base-100 hover:bg-base-200 transition-colors cursor-pointer"
+      title="Toggle theme"
+    >
+      <.icon name="hero-sun-micro" class="size-4 [[data-theme=dark]_&]:hidden" />
+      <.icon name="hero-moon-micro" class="size-4 [[data-theme=light]_&]:hidden" />
+    </button>
     """
   end
 
