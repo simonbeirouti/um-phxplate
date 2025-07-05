@@ -118,9 +118,9 @@ defmodule Public.CompanyShowLive do
               <div class="sm:col-span-1">
                 <dt class="text-sm font-medium text-base-content/60">Website</dt>
                 <dd class="mt-1">
-                  <a href={@company.website} target="_blank" class="link link-primary">
+                  <.link href={@company.website} target="_blank" class="link link-primary">
                     <%= @company.website %>
-                  </a>
+                  </.link>
                 </dd>
               </div>
             <% end %>
@@ -129,9 +129,9 @@ defmodule Public.CompanyShowLive do
               <div class="sm:col-span-1">
                 <dt class="text-sm font-medium text-base-content/60">Email</dt>
                 <dd class="mt-1">
-                  <a href={"mailto:#{@company.email}"} class="link link-primary">
+                  <.link href={"mailto:#{@company.email}"} class="link link-primary">
                     <%= @company.email %>
-                  </a>
+                  </.link>
                 </dd>
               </div>
             <% end %>
@@ -140,9 +140,9 @@ defmodule Public.CompanyShowLive do
               <div class="sm:col-span-1">
                 <dt class="text-sm font-medium text-base-content/60">Phone</dt>
                 <dd class="mt-1">
-                  <a href={"tel:#{@company.phone}"} class="link link-primary">
+                  <.link href={"tel:#{@company.phone}"} class="link link-primary">
                     <%= @company.phone %>
-                  </a>
+                  </.link>
                 </dd>
               </div>
             <% end %>

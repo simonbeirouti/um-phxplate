@@ -67,33 +67,33 @@ defmodule Admin.Live.Hooks.LayoutHooks do
         items: [
           %{
             label: "Dashboard",
-            path: "/dashboard/super_admin",
+            path: "/",
             icon: "hero-home",
-            active_paths: ["/dashboard/super_admin"]
+            active_paths: ["/"]
           },
           %{
             label: "Subscriptions",
-            path: "/dashboard/super_admin/subscriptions",
+            path: "/dashboard/subscriptions",
             icon: "hero-credit-card",
-            active_paths: ["/dashboard/super_admin/subscriptions"]
+            active_paths: ["/subscriptions"]
           },
           %{
             label: "Blogs",
-            path: "/dashboard/super_admin/blogs",
+            path: "/dashboard/blogs",
             icon: "hero-document-text",
-            active_paths: ["/dashboard/super_admin/blogs"]
+            active_paths: ["/blogs"]
           },
           %{
             label: "Companies",
-            path: "/dashboard/super_admin/companies",
+            path: "/dashboard/companies",
             icon: "hero-building-office",
-            active_paths: ["/dashboard/super_admin/companies"]
+            active_paths: ["/companies"]
           },
           %{
             label: "Settings",
-            path: "/dashboard/super_admin/platform-settings",
+            path: "/dashboard/platform-settings",
             icon: "hero-cog-6-tooth",
-            active_paths: ["/dashboard/super_admin/platform-settings"]
+            active_paths: ["/platform-settings"]
           }
         ]
       },
@@ -102,21 +102,21 @@ defmodule Admin.Live.Hooks.LayoutHooks do
         items: [
           %{
             label: "Support Chat",
-            path: "/dashboard/super_admin/chat",
+            path: "/dashboard/chat",
             icon: "hero-chat-bubble-left-right",
-            active_paths: ["/dashboard/super_admin/chat"]
+            active_paths: ["/chat"]
           },
           %{
             label: "Feature/Feedback",
-            path: "/dashboard/super_admin/feature-feedbacks",
+            path: "/dashboard/feature-feedbacks",
             icon: "hero-light-bulb",
-            active_paths: ["/dashboard/super_admin/feature-feedbacks"]
+            active_paths: ["/feature-feedbacks"]
           },
           %{
             label: "Users",
-            path: "/dashboard/super_admin/users",
+            path: "/dashboard/users",
             icon: "hero-users",
-            active_paths: ["/dashboard/super_admin/users"]
+            active_paths: ["/users"]
           }
         ]
       },
@@ -125,33 +125,33 @@ defmodule Admin.Live.Hooks.LayoutHooks do
         items: [
           %{
             label: "AI Chat",
-            path: "/dashboard/super_admin/ai-chat",
+            path: "/dashboard/ai-chat",
             icon: "hero-cpu-chip",
-            active_paths: ["/dashboard/super_admin/ai-chat"]
+            active_paths: ["/ai-chat"]
           },
           %{
             label: "AI Prompts",
-            path: "/dashboard/super_admin/ai-prompts",
+            path: "/dashboard/ai-prompts",
             icon: "hero-command-line",
-            active_paths: ["/dashboard/super_admin/ai-prompts"]
+            active_paths: ["/ai-prompts"]
           },
           %{
             label: "AI Evaluations",
-            path: "/dashboard/super_admin/ai-evals",
+            path: "/dashboard/ai-evals",
             icon: "hero-chart-bar",
-            active_paths: ["/dashboard/super_admin/ai-evals"]
+            active_paths: ["/ai-evals"]
           },
           %{
             label: "AI Eval Results",
-            path: "/dashboard/super_admin/ai-eval-results",
+            path: "/dashboard/ai-eval-results",
             icon: "hero-chart-pie",
-            active_paths: ["/dashboard/super_admin/ai-eval-results"]
+            active_paths: ["/ai-eval-results"]
           },
           %{
             label: "AI Results",
-            path: "/dashboard/super_admin/ai-results",
+            path: "/dashboard/ai-results",
             icon: "hero-clipboard-document-list",
-            active_paths: ["/dashboard/super_admin/ai-results"]
+            active_paths: ["/ai-results"]
           }
         ]
       }

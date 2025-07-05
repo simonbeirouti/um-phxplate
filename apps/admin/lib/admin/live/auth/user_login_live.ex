@@ -76,9 +76,9 @@ defmodule Admin.UserLoginLive do
                 <span class="label-text ml-2">Keep me logged in</span>
               </label>
 
-              <a href={~p"/reset-password"} class="text-sm font-semibold">
+              <.link href={~p"/reset-password"} class="text-sm font-semibold">
                 Forgot your password?
-              </a>
+              </.link>
             </div>
             <button phx-disable-with="Logging in..." class="btn btn-primary w-full">
               Log in <span aria-hidden="true">→</span>

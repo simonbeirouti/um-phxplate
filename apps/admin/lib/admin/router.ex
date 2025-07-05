@@ -50,7 +50,7 @@ defmodule Admin.Router do
         {Core.Auth, :ensure_authenticated},
         {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
-      live "/", DashboardLive, :index
+      live "/", SuperAdminLive, :index
     end
 
     # Super Admin Platform Management
@@ -61,11 +61,10 @@ defmodule Admin.Router do
         {Core.Auth, :ensure_authenticated},
         {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
-      live "/super_admin", SuperAdmin.DashboardLive, :index
-      live "/super_admin/subscriptions", SuperAdmin.SubscriptionsLive, :index
-      live "/super_admin/blogs", SuperAdmin.BlogsLive, :index
-      live "/super_admin/companies", SuperAdmin.CompaniesLive, :index
-      live "/super_admin/platform-settings", SuperAdmin.PlatformSettingsLive, :index
+      live "/subscriptions", SubscriptionsLive, :index
+      live "/blogs", BlogsLive, :index
+      live "/companies", CompaniesLive, :index
+      live "/platform-settings", PlatformSettingsLive, :index
     end
 
     # Super Admin Customer Engagement
@@ -76,9 +75,9 @@ defmodule Admin.Router do
         {Core.Auth, :ensure_authenticated},
         {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
-      live "/super_admin/chat", SuperAdmin.ChatLive, :index
-      live "/super_admin/feature-feedbacks", SuperAdmin.FeatureFeedbacksLive, :index
-      live "/super_admin/users", SuperAdmin.UsersLive, :index
+      live "/chat", ChatLive, :index
+      live "/feature-feedbacks", FeatureFeedbacksLive, :index
+      live "/users", UsersLive, :index
     end
 
     # Super Admin AI Management
@@ -89,11 +88,11 @@ defmodule Admin.Router do
         {Core.Auth, :ensure_authenticated},
         {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
-      live "/super_admin/ai-chat", SuperAdmin.AiChatLive, :index
-      live "/super_admin/ai-prompts", SuperAdmin.AiPromptsLive, :index
-      live "/super_admin/ai-evals", SuperAdmin.AiEvalsLive, :index
-      live "/super_admin/ai-eval-results", SuperAdmin.AiEvalResultsLive, :index
-      live "/super_admin/ai-results", SuperAdmin.AiResultsLive, :index
+      live "/ai-chat", AiChatLive, :index
+      live "/ai-prompts", AiPromptsLive, :index
+      live "/ai-evals", AiEvalsLive, :index
+      live "/ai-eval-results", AiEvalResultsLive, :index
+      live "/ai-results", AiResultsLive, :index
     end
   end
 
