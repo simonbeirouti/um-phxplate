@@ -14,35 +14,6 @@ defmodule Admin.DashboardLive do
   def render(assigns) do
     ~H"""
     <div class="min-h-screen bg-base-100">
-      <!-- Header -->
-      <div class="navbar bg-base-200 shadow-sm">
-        <div class="flex-1">
-          <h1 class="text-xl font-bold">Admin Dashboard</h1>
-        </div>
-        <div class="flex-none gap-2">
-          <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-              <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                {String.first(@current_user.email) |> String.upcase()}
-              </div>
-            </div>
-            <ul
-              tabindex="0"
-              class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-auto"
-            >
-              <li><span class="text-sm text-base-content/70">{@current_user.email}</span></li>
-              <li><span class="text-sm text-base-content/70">Role: {@current_user.role}</span></li>
-              <div class="divider my-1"></div>
-              <li>
-                <.link href="/logout" method="delete">
-                  <.icon name="hero-arrow-right-on-rectangle" class="w-4 h-4 mr-2" />
-                  Logout
-                </.link>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
 
     <!-- Main Content -->
       <div class="container mx-auto px-4 py-8">

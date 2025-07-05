@@ -31,19 +31,70 @@ defmodule Admin.Router do
     post "/login", UserSessionController, :create
   end
 
-  # Routes for authenticated users
+  # Routes for authenticated users (non-dashboard)
   scope "/", Admin do
     pipe_through [:browser, :require_authenticated_user]
 
-    live_session :require_authenticated_user,
+    delete "/logout", UserSessionController, :delete
+  end
+
+  # Dashboard routes with dashboard layout
+  scope "/dashboard", Admin do
+    pipe_through [:browser, :require_authenticated_user]
+
+    # Main dashboard
+    live_session :dashboard,
+      layout: {Admin.Layouts, :dashboard},
       on_mount: [
         {Core.Auth, :mount_current_user},
-        {Core.Auth, :ensure_authenticated}
+        {Core.Auth, :ensure_authenticated},
+        {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
-      live "/dashboard", DashboardLive, :index
+      live "/", DashboardLive, :index
     end
 
-    delete "/logout", UserSessionController, :delete
+    # Super Admin Platform Management
+    live_session :platform_management,
+      layout: {Admin.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :mount_current_user},
+        {Core.Auth, :ensure_authenticated},
+        {Admin.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/super_admin", SuperAdmin.DashboardLive, :index
+      live "/super_admin/subscriptions", SuperAdmin.SubscriptionsLive, :index
+      live "/super_admin/blogs", SuperAdmin.BlogsLive, :index
+      live "/super_admin/companies", SuperAdmin.CompaniesLive, :index
+      live "/super_admin/platform-settings", SuperAdmin.PlatformSettingsLive, :index
+    end
+
+    # Super Admin Customer Engagement
+    live_session :customer_engagement,
+      layout: {Admin.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :mount_current_user},
+        {Core.Auth, :ensure_authenticated},
+        {Admin.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/super_admin/chat", SuperAdmin.ChatLive, :index
+      live "/super_admin/feature-feedbacks", SuperAdmin.FeatureFeedbacksLive, :index
+      live "/super_admin/users", SuperAdmin.UsersLive, :index
+    end
+
+    # Super Admin AI Management
+    live_session :ai_management,
+      layout: {Admin.Layouts, :dashboard},
+      on_mount: [
+        {Core.Auth, :mount_current_user},
+        {Core.Auth, :ensure_authenticated},
+        {Admin.Live.Hooks.LayoutHooks, :default}
+      ] do
+      live "/super_admin/ai-chat", SuperAdmin.AiChatLive, :index
+      live "/super_admin/ai-prompts", SuperAdmin.AiPromptsLive, :index
+      live "/super_admin/ai-evals", SuperAdmin.AiEvalsLive, :index
+      live "/super_admin/ai-eval-results", SuperAdmin.AiEvalResultsLive, :index
+      live "/super_admin/ai-results", SuperAdmin.AiResultsLive, :index
+    end
   end
 
   # Other scopes may use custom stacks.
