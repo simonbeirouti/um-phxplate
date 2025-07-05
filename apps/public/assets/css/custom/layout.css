@@ -106,10 +106,6 @@ html:not([data-theme="material"], [data-theme="material-dark"]) {
     #layout-sidebar {
         @apply border-base-200 border-e-[1px];
     }
-
-    #layout-topbar {
-        @apply border-base-200 border-b;
-    }
 }
 
 html[data-theme="material"],
@@ -117,9 +113,5 @@ html[data-theme="material-dark"] {
     #layout-sidebar {
         max-height: calc(100vh - 32px);
         @apply rounded-box top-4 bottom-4 ms-4;
-    }
-
-    #layout-topbar {
-        @apply rounded-box static mx-5 mt-4;
     }
 }
