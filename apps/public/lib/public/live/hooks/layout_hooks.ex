@@ -58,24 +58,17 @@ defmodule Public.Live.Hooks.LayoutHooks do
   Returns the navigation items for the dashboard based on user permissions.
   """
   defp dashboard_navigation_items(user) do
+    # Main dashboard group - accessible to all users
     dashboard_items = [
       %{
-        title: "Dashboard",
+        title: "Platform",
         items: [
           %{
             label: "Dashboard",
             path: "/dashboard",
             icon: "hero-home",
             active_paths: ["/dashboard"]
-          }
-        ]
-      }
-    ]
-
-    account_items = [
-      %{
-        title: "Account",
-        items: [
+          },
           %{
             label: "Invites",
             path: "/dashboard/invites",
@@ -87,35 +80,30 @@ defmodule Public.Live.Hooks.LayoutHooks do
             path: "/dashboard/account",
             icon: "hero-user-circle",
             active_paths: ["/dashboard/account"]
-          }
-        ]
-      }
-    ]
-
-    # Add role-based navigation items
-    role_based_items = get_role_based_navigation(user)
-
-    dashboard_items ++ role_based_items ++ account_items
-  end
-
-  @doc """
-  Returns additional navigation items based on user role.
-  """
-  defp get_role_based_navigation(user) do
-    basic_items = [
-      %{
-        title: "Basic Features",
-        items: [
+          },
           %{
             label: "Bookmarks",
             path: "/dashboard/basic/bookmarks",
             icon: "hero-bookmark",
             active_paths: ["/dashboard/basic/bookmarks"]
-          }
+          },
+          %{
+            label: "Support",
+            path: "/dashboard/support",
+            icon: "hero-question-mark-circle",
+            active_paths: ["/dashboard/support"]
+          },
         ]
       }
     ]
 
+    # Add role-based navigation items (admin only)
+    role_based_items = get_role_based_navigation(user)
+
+    dashboard_items ++ role_based_items
+  end
+
+  defp get_role_based_navigation(user) do
     admin_items = [
       %{
         title: "Admin",
@@ -137,8 +125,7 @@ defmodule Public.Live.Hooks.LayoutHooks do
     ]
 
     case user.role do
-      :basic -> basic_items
-      :admin -> basic_items ++ admin_items
+      :admin -> admin_items
       _ -> []
     end
   end
@@ -151,6 +138,4 @@ defmodule Public.Live.Hooks.LayoutHooks do
       String.starts_with?(current_path, path)
     end)
   end
-
-
 end

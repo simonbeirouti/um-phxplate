@@ -100,7 +100,7 @@ defmodule Public.CoreComponents do
       phx-hook="Flash"
       data-key={@kind}
       role="alert"
-      class="toast toast-top toast-end z-50 pointer-events-none"
+      class="toast toast-top toast-end z-60 pointer-events-none"
       {@rest}
     >
       <div class={[

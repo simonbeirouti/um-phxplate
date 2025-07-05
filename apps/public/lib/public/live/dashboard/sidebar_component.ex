@@ -23,10 +23,23 @@ defmodule Public.Dashboard.SidebarComponent do
       />
 
       <div id="layout-sidebar" class="flex flex-col h-full">
-        <a class="flex min-h-16 items-center justify-center" href={~p"/dashboard"}>
-          <img alt="logo-dark" class="hidden h-5 dark:inline" src="/images/logo/logo-dark.png" />
-          <img alt="logo-light" class="h-5 dark:hidden" src="/images/logo/logo-light.png" />
-        </a>
+        <!-- User info at top -->
+        <div class="flex min-h-16 items-center gap-2.5 px-3 py-2">
+          <div class="avatar">
+            <div class="bg-base-200 mask mask-squircle w-8">
+              <img
+                alt="Avatar"
+                src={@dashboard_user.profile.avatar_url || "/images/avatars/1.png"}
+              />
+            </div>
+          </div>
+          <div class="grow -space-y-0.5">
+            <p class="text-sm font-medium">
+              {@dashboard_user.profile.first_name} {@dashboard_user.profile.last_name}
+            </p>
+            <p class="text-base-content/60 text-xs">{@dashboard_user.email}</p>
+          </div>
+        </div>
         <div class="relative min-h-0 grow">
           <div data-simplebar class="size-full">
             <div id="sidebar-menu" class="menu">
@@ -360,48 +373,16 @@ defmodule Public.Dashboard.SidebarComponent do
           <div class="from-base-100/60 pointer-events-none absolute start-0 end-0 bottom-0 h-7 bg-linear-to-t to-transparent">
           </div>
         </div>
-        <div class="mt-auto mb-2">
-          <div class="dropdown dropdown-right dropdown-end w-full">
-            <div
-              tabindex="0"
-              role="button"
-              class="bg-base-200 hover:bg-base-300 rounded-box mx-2 mt-0 flex cursor-pointer items-center gap-2.5 px-3 py-2 transition-all"
-            >
-              <div class="avatar">
-                <div class="bg-base-200 mask mask-squircle bg-base-200 w-8">
-                  <img
-                    alt="Avatar"
-                    src={@dashboard_user.profile.avatar_url || "/images/avatars/1.png"}
-                  />
-                </div>
-              </div>
-              <div class="grow -space-y-0.5">
-                <p class="text-sm font-medium">
-                  {@dashboard_user.profile.first_name} {@dashboard_user.profile.last_name}
-                </p>
-                <p class="text-base-content/60 text-xs">{@dashboard_user.email}</p>
-              </div>
-              <.icon name="hero-chevron-up-down" class="text-base-content/60 size-4" />
-            </div>
-            <ul
-              role="menu"
-              class="dropdown-content menu bg-base-100 rounded-box shadow-base-content/40 mb-1 w-48 p-1 shadow-[0px_-10px_40px_0px]"
-              tabindex="0"
-            >
-              <li>
-                <.link href={~p"/contact"}>
-                  <.icon name="hero-question-mark-circle" class="size-4" />
-                  <span>Help</span>
-                </.link>
-              </li>
-              <li>
-                <.link href={~p"/logout"} method="delete">
-                  <.icon name="hero-arrows-right-left" class="size-4" />
-                  <span>Logout</span>
-                </.link>
-              </li>
-            </ul>
-          </div>
+        <!-- Simple logout button at bottom -->
+        <div class="mt-auto mb-2 px-2">
+          <.link
+            href={~p"/logout"}
+            method="delete"
+            class="btn btn-outline btn-sm w-full flex items-center gap-2"
+          >
+            <.icon name="hero-arrow-right-on-rectangle" class="size-4" />
+            <span>Logout</span>
+          </.link>
         </div>
       </div>
 
