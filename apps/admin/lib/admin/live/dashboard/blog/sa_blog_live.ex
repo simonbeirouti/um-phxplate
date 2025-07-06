@@ -212,13 +212,6 @@ defmodule Admin.BlogsLive do
     {:noreply, assign(socket, changeset: changeset, form_changed: false)}
   end
 
-  @impl true
-  def handle_params(_params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-    {:noreply, socket}
-  end
-
   defp save_post(socket, %Post{id: nil}, post_params, current_user) do
     case Blog.create_post(post_params, current_user) do
       {:ok, post} ->
@@ -294,36 +287,36 @@ defmodule Admin.BlogsLive do
           <h2 class="text-xl font-semibold mb-4">Posts</h2>
 
           <%= if Enum.empty?(@posts) do %>
-            <div class="p-4 bg-gray-50 rounded-md">
-              <p class="text-gray-500 text-center">No posts available yet</p>
-              <p class="text-gray-500 text-center mt-2">
+            <div class="p-4 bg-base-200 rounded-md">
+              <p class="text-base-content/70 text-center">No posts available yet</p>
+              <p class="text-base-content/70 text-center mt-2">
                 Click "New Post" to create your first blog post
               </p>
             </div>
           <% else %>
-            <div class="divide-y">
+            <div class="divide-y divide-base-300">
               <%= for post <- @posts do %>
                 <div
-                  class={"cursor-pointer p-3 rounded-md hover:bg-gray-50 relative #{if @selected_post && @selected_post.id == post.id, do: "bg-gray-100 border-l-4 border-blue-500", else: ""}"}
+                  class={"cursor-pointer p-3 rounded-md hover:bg-base-200 relative #{if @selected_post && @selected_post.id == post.id, do: "bg-base-200 border-l-4 border-primary", else: ""}"}
                   phx-click="select_post"
                   phx-value-id={post.id}
                 >
                   <!-- Post content -->
                   <div class="flex justify-between items-center">
-                    <h4 class="text-sm font-medium text-gray-900">{post.title}</h4>
+                    <h4 class="text-sm font-medium text-base-content">{post.title}</h4>
                     <span class={[
                       "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
                       case post.published do
-                        :published -> "bg-green-100 text-green-800"
-                        :draft -> "bg-yellow-100 text-yellow-800"
-                        :unpublished -> "bg-gray-100 text-gray-800"
+                        :published -> "badge badge-success"
+                        :draft -> "badge badge-warning"
+                        :unpublished -> "badge badge-ghost"
                       end
                     ]}>
                       {post.published}
                     </span>
                   </div>
                   <div class="mt-1">
-                    <p class="text-xs text-gray-500">
+                    <p class="text-xs text-base-content/70">
                       Created: {Calendar.strftime(post.inserted_at, "%B %d, %Y at %H:%M")}
                     </p>
                   </div>
@@ -367,7 +360,7 @@ defmodule Admin.BlogsLive do
           <%= if @selected_post do %>
             {render_post_details(assign(assigns, :context, "desktop"))}
           <% else %>
-            <p class="text-gray-500">Select a post to view details</p>
+            <p class="text-base-content/70">Select a post to view details</p>
           <% end %>
         </div>
       </div>
@@ -388,6 +381,8 @@ defmodule Admin.BlogsLive do
               <% end %>
               <%= if @selected_post do %>
                 <%= render_post_details(assign(assigns, :context, "mobile")) %>
+              <% else %>
+                <p class="text-base-content/70">Select a post to view details</p>
               <% end %>
             </div>
           </div>
@@ -419,7 +414,7 @@ defmodule Admin.BlogsLive do
                   required
                 />
                 <%= if @new_post_changeset.errors[:title] do %>
-                  <p class="text-sm text-red-600 mt-1 capitalize">
+                  <p class="text-sm text-error mt-1 capitalize">
                     {elem(@new_post_changeset.errors[:title], 0)}
                   </p>
                 <% end %>
@@ -436,7 +431,7 @@ defmodule Admin.BlogsLive do
                   class="input input-bordered w-full text-base"
                 />
                 <%= if @new_post_changeset.errors[:description] do %>
-                  <p class="text-sm text-red-600 mt-1 capitalize">
+                  <p class="text-sm text-error mt-1 capitalize">
                     {elem(@new_post_changeset.errors[:description], 0)}
                   </p>
                 <% end %>
@@ -454,7 +449,7 @@ defmodule Admin.BlogsLive do
                   required
                 ></textarea>
                 <%= if @new_post_changeset.errors[:content] do %>
-                  <p class="text-sm text-red-600 mt-1 capitalize">
+                  <p class="text-sm text-error mt-1 capitalize">
                     {elem(@new_post_changeset.errors[:content], 0)}
                   </p>
                 <% end %>
@@ -656,22 +651,22 @@ defmodule Admin.BlogsLive do
             </div>
           </div>
 
-          <div class="pt-6 border-t">
-            <%= if @delete_confirmation do %>
-              <div class="flex w-full justify-between space-x-4">
-                <button class="btn btn-error w-full" phx-click="confirm_delete_post">
-                  Confirm Delete
-                </button>
-                <button class="btn w-full" phx-click="cancel_delete">
-                  Cancel
-                </button>
+              <div class="pt-6 border-t border-base-300">
+                <%= if @delete_confirmation do %>
+                  <div class="flex w-full justify-between space-x-4">
+                    <button class="btn btn-error w-full" phx-click="confirm_delete_post">
+                      Confirm Delete
+                    </button>
+                    <button class="btn btn-outline w-full" phx-click="cancel_delete">
+                      Cancel
+                    </button>
+                  </div>
+                <% else %>
+                  <button class="btn btn-error w-full" phx-click="delete_post">
+                    Delete Post
+                  </button>
+                <% end %>
               </div>
-            <% else %>
-              <button class="btn btn-error w-full" phx-click="delete_post">
-                Delete Post
-              </button>
-            <% end %>
-          </div>
         </div>
       </div>
 

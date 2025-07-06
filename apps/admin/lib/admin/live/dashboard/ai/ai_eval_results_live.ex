@@ -46,15 +46,12 @@ defmodule Admin.AiEvalResultsLive do
      |> PageMeta.assign_metadata(
        title: "AI Eval Results",
        description: "View AI evaluation results",
-       url: "/dashboard/super_admin/ai-eval-results"
+       url: "/dashboard/ai-eval-results"
      )}
   end
 
   @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     page = String.to_integer(Map.get(params, "page", "1"))
 
     {:noreply,
@@ -125,7 +122,7 @@ defmodule Admin.AiEvalResultsLive do
      socket
      |> assign(:page, page)
      |> load_eval_runs()
-     |> push_patch(to: ~p"/dashboard/super_admin/ai-results?page=#{page}")}
+     |> push_patch(to: ~p"/dashboard/ai-results?page=#{page}")}
   end
 
   @impl true
@@ -652,11 +649,11 @@ defmodule Admin.AiEvalResultsLive do
   defp empty_state(assigns) do
     ~H"""
     <div class="text-center py-12">
-      <div class="mx-auto h-12 w-12 text-gray-400">
+      <div class="mx-auto h-12 w-12 text-base-content/40">
         <.icon name="hero-chart-bar" class="h-12 w-12" />
       </div>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No evaluation results found</h3>
-      <p class="mt-1 text-sm text-gray-500">
+      <h3 class="mt-2 text-sm font-medium text-base-content">No evaluation results found</h3>
+      <p class="mt-1 text-sm text-base-content/70">
         Run some evaluations to see results here.
       </p>
     </div>
@@ -667,20 +664,21 @@ defmodule Admin.AiEvalResultsLive do
     ~H"""
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       <%= for eval_run <- @eval_runs do %>
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <%= if eval_run.eval do %>
+        <div class="bg-base-100 rounded-lg border border-base-300 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div class="p-6">
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <h3 class="text-lg font-semibold text-gray-900 truncate">
+                  <h3 class="text-lg font-semibold text-base-content truncate">
                     {eval_run.eval.name}
                   </h3>
                   <%= if not Enum.empty?(get_active_advanced_params(eval_run)) do %>
-                    <.icon name="hero-cog" class="h-4 w-4 text-blue-600 flex-shrink-0" title="Advanced parameters used" />
+                    <.icon name="hero-cog" class="h-4 w-4 text-info flex-shrink-0" title="Advanced parameters used" />
                   <% end %>
                 </div>
                 <%= if eval_run.prompt do %>
-                  <p class="text-sm text-gray-500 mt-1">
+                  <p class="text-sm text-base-content/70 mt-1">
                     Prompt: {String.slice(eval_run.prompt.name, 0, 25)}{if String.length(eval_run.prompt.name) > 25, do: "..."}
                   </p>
                 <% end %>
@@ -721,12 +719,12 @@ defmodule Admin.AiEvalResultsLive do
 
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <p class="text-sm font-medium text-gray-500">Model</p>
-                <p class="text-sm text-gray-900 mt-1">{get_display_model_name(eval_run.model)}</p>
+                <p class="text-sm font-medium text-base-content/70">Model</p>
+                <p class="text-sm text-base-content mt-1">{get_display_model_name(eval_run.model)}</p>
               </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <p class="text-sm font-medium text-gray-500">Score</p>
+                  <p class="text-sm font-medium text-base-content/70">Score</p>
                   <% success_status = get_eval_run_success_status(eval_run) %>
                     <%= if success_status != "unknown" do %>
                       <span class={[
@@ -737,7 +735,7 @@ defmodule Admin.AiEvalResultsLive do
                       </span>
                     <% end %>
                 </div>
-                <p class="text-sm text-gray-900 mt-1">
+                <p class="text-sm text-base-content mt-1">
                   <%= if eval_run.score do %>
                     <span class="font-semibold">{format_score(eval_run.score)}</span>
                   <% else %>
@@ -749,14 +747,14 @@ defmodule Admin.AiEvalResultsLive do
 
             <div class="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <p class="text-sm font-medium text-gray-500">Duration</p>
-                <p class="text-sm text-gray-600 mt-1">
+                <p class="text-sm font-medium text-base-content/70">Duration</p>
+                <p class="text-sm text-base-content/80 mt-1">
                   {format_duration(eval_run.started_at, eval_run.completed_at)}
                 </p>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-500">Run Date</p>
-                <p class="text-sm text-gray-600 mt-1" data-utc-time={DateTime.to_iso8601(eval_run.inserted_at)}>
+                <p class="text-sm font-medium text-base-content/70">Run Date</p>
+                <p class="text-sm text-base-content/80 mt-1" data-utc-time={DateTime.to_iso8601(eval_run.inserted_at)}>
                   {Calendar.strftime(eval_run.inserted_at, "%d/%m, %H:%M")}
                 </p>
               </div>
@@ -766,14 +764,14 @@ defmodule Admin.AiEvalResultsLive do
               <%= if @delete_confirmation_id == eval_run.id do %>
                 <div class="flex gap-2 w-full">
                   <button
-                    class="btn btn-outline btn-sm flex-1 border-green-300 text-green-700 hover:bg-green-50"
+                    class="btn btn-outline btn-success btn-sm flex-1"
                     phx-click="confirm_delete"
                     phx-value-id={eval_run.id}
                   >
                     <.icon name="hero-check" class="h-4 w-4 mr-2" /> Confirm
                   </button>
                   <button
-                    class="btn btn-outline btn-sm flex-1 border-red-300 text-red-700 hover:bg-red-50"
+                    class="btn btn-outline btn-error btn-sm flex-1"
                     phx-click="cancel_delete"
                   >
                     <.icon name="hero-x-mark" class="h-4 w-4 mr-2" /> Cancel
@@ -790,7 +788,7 @@ defmodule Admin.AiEvalResultsLive do
                     <.icon name="hero-eye" class="h-4 w-4 mr-2" /> View Results
                   </button>
                   <button
-                    class="btn btn-outline btn-sm px-3 border-red-300 text-red-700 hover:bg-red-50"
+                    class="btn btn-outline btn-error btn-sm px-3"
                     phx-click="delete_eval_run"
                     phx-value-id={eval_run.id}
                   >
@@ -801,6 +799,12 @@ defmodule Admin.AiEvalResultsLive do
             </div>
           </div>
         </div>
+        <% else %>
+          <div class="bg-base-100 rounded-lg border border-base-300 shadow-sm p-6">
+            <p class="text-error">Error: Evaluation data missing for this run.</p>
+            <p class="text-xs text-base-content/70">Run ID: {eval_run.id}</p>
+          </div>
+        <% end %>
       <% end %>
     </div>
     """
@@ -811,22 +815,22 @@ defmodule Admin.AiEvalResultsLive do
     <%= if @eval_run do %>
       <div class="space-y-6">
 
-        <div class="bg-gray-50 rounded-lg p-4">
+        <div class="bg-base-200 rounded-lg p-4">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <h3 class="text-lg font-medium text-gray-900">{@eval_run.eval.name}</h3>
-              <p class="text-sm text-gray-600 mt-1">Model: {get_display_model_name(@eval_run.model)}</p>
+              <h3 class="text-lg font-medium text-base-content">{@eval_run.eval.name}</h3>
+              <p class="text-sm text-base-content/70 mt-1">Model: {get_display_model_name(@eval_run.model)}</p>
               <%= if @eval_run.prompt do %>
-                <p class="text-sm text-gray-600">Prompt: {@eval_run.prompt.name}</p>
+                <p class="text-sm text-base-content/70">Prompt: {@eval_run.prompt.name}</p>
               <% end %>
               <% active_params = get_active_advanced_params(@eval_run) %>
               <%= if not Enum.empty?(active_params) do %>
                 <div class="mt-3">
                   <div class="flex items-center gap-2 mb-2">
-                    <.icon name="hero-cog" class="h-4 w-4 text-blue-600" />
-                    <span class="text-sm font-medium text-blue-900">Parameters: </span>
+                    <.icon name="hero-cog" class="h-4 w-4 text-info" />
+                    <span class="text-sm font-medium text-info-content">Parameters: </span>
                     <%= for param <- active_params do %>
-                      <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                      <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-info/20 text-info-content rounded-full">
                         {param}
                       </span>
                     <% end %>
@@ -834,53 +838,53 @@ defmodule Admin.AiEvalResultsLive do
                 </div>
               <% end %>
             </div>
-            <div class="text-right">
-              <span class={[
-                "inline-flex px-3 py-1 text-sm font-semibold rounded-full",
-                status_badge_class(@eval_run.status)
-              ]}>
-                {String.capitalize(@eval_run.status)}
-              </span>
-              <%= if @eval_run.score do %>
-                <p class="text-2xl font-bold text-gray-900 mt-2">
-                  {format_score(@eval_run.score)}
-                </p>
-                <p class="text-sm text-gray-500">Overall Score</p>
-              <% end %>
-            </div>
-          </div>
-
-          <%= if @eval_run.status == "completed" and @eval_run.results do %>
-            <% test_results = get_test_case_results(@eval_run.results) %>
-            <% {passed_count, total_count, avg_score, length_analysis} =
-              calculate_summary_stats(test_results) %>
-
-            <div class="border-t border-gray-200 pt-4">
-              <h4 class="text-lg font-medium text-gray-900 mb-3">Evaluation Summary</h4>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-gray-900">{passed_count}/{total_count}</div>
-                  <div class="text-sm text-gray-600">Tests Passed</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-gray-900">
-                    {Float.round(passed_count / total_count * 100, 1)}%
-                  </div>
-                  <div class="text-sm text-gray-600">Pass Rate</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-gray-900">{format_score(avg_score)}</div>
-                  <div class="text-sm text-gray-600">Avg Score</div>
-                </div>
-                <div class="text-center">
-                  <div class="text-2xl font-bold text-gray-900">{length_analysis.avg_ratio}x</div>
-                  <div class="text-sm text-gray-600">Avg Length Ratio</div>
-                </div>
+              <div class="text-right">
+                <span class={[
+                  "inline-flex px-3 py-1 text-sm font-semibold rounded-full",
+                  status_badge_class(@eval_run.status)
+                ]}>
+                  {String.capitalize(@eval_run.status)}
+                </span>
+                <%= if @eval_run.score do %>
+                  <p class="text-2xl font-bold text-base-content mt-2">
+                    {format_score(@eval_run.score)}
+                  </p>
+                  <p class="text-sm text-base-content/70">Overall Score</p>
+                <% end %>
               </div>
-              <%= if length_analysis.avg_ratio > 3.0 do %>
-                <div class="mt-3 p-3 bg-yellow-100 border border-yellow-300 rounded text-sm text-yellow-800">
-                  ⚠️ Responses are significantly longer than expected. Consider reviewing conciseness instructions.
+            </div>
+
+            <%= if @eval_run.status == "completed" and @eval_run.results do %>
+              <% test_results = get_test_case_results(@eval_run.results) %>
+              <% {passed_count, total_count, avg_score, length_analysis} =
+                calculate_summary_stats(test_results) %>
+
+              <div class="border-t border-base-300 pt-4">
+                <h4 class="text-lg font-medium text-base-content mb-3">Evaluation Summary</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-base-content">{passed_count}/{total_count}</div>
+                    <div class="text-sm text-base-content/70">Tests Passed</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-base-content">
+                      {Float.round(passed_count / total_count * 100, 1)}%
+                    </div>
+                    <div class="text-sm text-base-content/70">Pass Rate</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-base-content">{format_score(avg_score)}</div>
+                    <div class="text-sm text-base-content/70">Avg Score</div>
+                  </div>
+                  <div class="text-center">
+                    <div class="text-2xl font-bold text-base-content">{length_analysis.avg_ratio}x</div>
+                    <div class="text-sm text-base-content/70">Avg Length Ratio</div>
+                  </div>
                 </div>
+                <%= if length_analysis.avg_ratio > 3.0 do %>
+                  <div class="mt-3 p-3 bg-warning/20 border border-warning/30 rounded text-sm text-warning-content">
+                    ⚠️ Responses are significantly longer than expected. Consider reviewing conciseness instructions.
+                  </div>
               <% end %>
             </div>
 
@@ -889,23 +893,23 @@ defmodule Admin.AiEvalResultsLive do
 
         <%= if @eval_run.status == "completed" and @eval_run.results do %>
           <div>
-            <h4 class="text-lg font-medium text-gray-900 mb-4">Test Case Results</h4>
+            <h4 class="text-lg font-medium text-base-content mb-4">Test Case Results</h4>
             <div class="space-y-4">
               <%= for {test_name, result} <- get_test_case_results(@eval_run.results) do %>
-                <div class="border border-gray-200 rounded-lg p-4">
+                <div class="border border-base-300 rounded-lg p-4">
                   <div class="flex items-center justify-between mb-3">
-                    <h5 class="text-md font-medium text-gray-900">{test_name}</h5>
+                    <h5 class="text-md font-medium text-base-content">{test_name}</h5>
                     <div class="flex items-center gap-2">
                       <%= if Map.get(result, :score) do %>
-                        <span class="text-sm font-medium text-gray-700">
+                        <span class="text-sm font-medium text-base-content/80">
                           Score: {format_score(Map.get(result, :score))}
                         </span>
                       <% end %>
                       <span class={[
                         "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
                         if(Map.get(result, :passed),
-                          do: "bg-green-100 text-green-800",
-                          else: "bg-red-100 text-red-800"
+                          do: "bg-success/20 text-success-content",
+                          else: "bg-error/20 text-error-content"
                         )
                       ]}>
                         {if Map.get(result, :passed), do: "Passed", else: "Failed"}
@@ -915,21 +919,21 @@ defmodule Admin.AiEvalResultsLive do
 
                   <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     <div>
-                      <h6 class="text-sm font-medium text-gray-700 mb-2">Input</h6>
-                      <div class="bg-gray-50 rounded p-3 text-sm">
+                      <h6 class="text-sm font-medium text-base-content/80 mb-2">Input</h6>
+                      <div class="bg-base-200 rounded p-3 text-sm">
                         <pre class="whitespace-pre-wrap">{Map.get(result, :input, "")}</pre>
                       </div>
                     </div>
 
                     <div>
-                      <h6 class="text-sm font-medium text-gray-700 mb-2">Expected Output</h6>
-                      <div class="bg-gray-50 rounded p-3 text-sm">
+                      <h6 class="text-sm font-medium text-base-content/80 mb-2">Expected Output</h6>
+                      <div class="bg-base-200 rounded p-3 text-sm">
                         <pre class="whitespace-pre-wrap">{Map.get(result, :expected, "")}</pre>
                       </div>
                     </div>
 
                     <div>
-                      <h6 class="text-sm font-medium text-gray-700 mb-2">
+                      <h6 class="text-sm font-medium text-base-content/80 mb-2">
                         Actual Output <% expected_len =
                           String.length(Map.get(result, :expected, "")) %>
                         <% actual_len = String.length(Map.get(result, :output, "")) %>
@@ -937,15 +941,15 @@ defmodule Admin.AiEvalResultsLive do
                           <span class={[
                             "text-xs px-1 py-0.5 rounded ml-2",
                             if(actual_len > expected_len * 3,
-                              do: "bg-red-100 text-red-700",
-                              else: "bg-green-100 text-green-700"
+                              do: "bg-error/20 text-error-content",
+                              else: "bg-success/20 text-success-content"
                             )
                           ]}>
                             {Float.round(actual_len / expected_len, 1)}x length
                           </span>
                         <% end %>
                       </h6>
-                      <div class="bg-gray-50 rounded p-3 text-sm max-h-40 overflow-y-auto">
+                      <div class="bg-base-200 rounded p-3 text-sm max-h-40 overflow-y-auto">
                         <div class="prose prose-sm max-w-none">
                           {to_html(Map.get(result, :output, ""))}
                         </div>
@@ -955,8 +959,8 @@ defmodule Admin.AiEvalResultsLive do
 
                   <%= if Map.get(result, :reasoning) do %>
                     <div class="mt-4">
-                      <h6 class="text-sm font-medium text-gray-700 mb-2">Judge Evaluation</h6>
-                      <div class="bg-blue-50 rounded p-3 text-sm">
+                      <h6 class="text-sm font-medium text-base-content/80 mb-2">Judge Evaluation</h6>
+                      <div class="bg-info/10 rounded p-3 text-sm">
                         <pre class="whitespace-pre-wrap">{Map.get(result, :reasoning)}</pre>
                       </div>
                     </div>
@@ -964,8 +968,8 @@ defmodule Admin.AiEvalResultsLive do
 
                   <%= if Map.get(result, :error) do %>
                     <div class="mt-4">
-                      <h6 class="text-sm font-medium text-red-700 mb-2">Error</h6>
-                      <div class="bg-red-50 rounded p-3 text-sm text-red-800">
+                      <h6 class="text-sm font-medium text-error mb-2">Error</h6>
+                      <div class="bg-error/10 rounded p-3 text-sm text-error-content">
                         <pre class="whitespace-pre-wrap">{Map.get(result, :error)}</pre>
                       </div>
                     </div>
@@ -979,22 +983,22 @@ defmodule Admin.AiEvalResultsLive do
 
       <%= if @eval_run.status == "failed" and @eval_run.results do %>
         <div>
-          <h4 class="text-lg font-medium text-red-700 mb-4">Error Details</h4>
-          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-            <pre class="text-sm text-red-800 whitespace-pre-wrap">{inspect(@eval_run.results)}</pre>
+          <h4 class="text-lg font-medium text-error mb-4">Error Details</h4>
+          <div class="bg-error/10 border border-error/20 rounded-lg p-4">
+            <pre class="text-sm text-error-content whitespace-pre-wrap">{inspect(@eval_run.results)}</pre>
           </div>
         </div>
       <% end %>
 
-      <div class="flex justify-end pt-4 border-t border-gray-200">
+      <div class="flex justify-end pt-4 border-t border-base-300">
         <button class="btn btn-outline w-full" phx-click="close_drawer">
           Close
         </button>
       </div>
     <% else %>
       <div class="space-y-4">
-        <p class="text-sm text-gray-500">Loading evaluation results...</p>
-        <div class="flex justify-end pt-4 border-t border-gray-200">
+        <p class="text-sm text-base-content/70">Loading evaluation results...</p>
+        <div class="flex justify-end pt-4 border-t border-base-300">
           <button class="btn btn-outline w-full" phx-click="close_drawer">
             Close
           </button>

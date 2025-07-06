@@ -26,15 +26,8 @@ defmodule Admin.PlatformSettingsLive do
      |> PageMeta.assign_metadata(
        title: "Platform Settings",
        description: "Configure platform-wide settings and features",
-       url: "/dashboard/super_admin/platform-settings"
+       url: "/dashboard/platform-settings"
      )}
-  end
-
-  @impl true
-  def handle_params(_params, url, socket) do
-    uri = URI.parse(url)
-    socket = Phoenix.Component.update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-    {:noreply, socket}
   end
 
   @impl true
@@ -118,10 +111,10 @@ defmodule Admin.PlatformSettingsLive do
       </.header>
 
       <div class="mt-8 max-w-4xl">
-        <div class="bg-white shadow rounded-lg">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Product Types</h3>
-            <p class="mt-1 text-sm text-gray-600">
+        <div class="bg-base-100 shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-base-300">
+            <h3 class="text-lg font-medium text-base-content">Product Types</h3>
+            <p class="mt-1 text-sm text-base-content/70">
               Control which product types are available across the platform
             </p>
           </div>
@@ -130,10 +123,10 @@ defmodule Admin.PlatformSettingsLive do
             <%= for setting <- @platform_settings do %>
               <div class="flex items-center justify-between">
                 <div class="flex-1">
-                  <h4 class="text-sm font-medium text-gray-900">
+                  <h4 class="text-sm font-medium text-base-content">
                     {format_setting_title(setting.key)}
                   </h4>
-                  <p class="text-sm text-gray-600">
+                  <p class="text-sm text-base-content/70">
                     {setting.description}
                   </p>
                 </div>
@@ -157,25 +150,25 @@ defmodule Admin.PlatformSettingsLive do
             <div class={[
               "border rounded-lg p-4",
               if(setting.value,
-                do: "border-green-200 bg-green-50",
-                else: "border-gray-200 bg-gray-50"
+                do: "border-success/20 bg-success/10",
+                else: "border-base-300 bg-base-200"
               )
             ]}>
               <div class="flex items-center justify-between">
-                <h4 class="text-sm font-medium text-gray-900">
+                <h4 class="text-sm font-medium text-base-content">
                   {format_setting_title(setting.key)}
                 </h4>
                 <span class={[
                   "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
                   if(setting.value,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-gray-100 text-gray-800"
+                    do: "badge badge-success",
+                    else: "badge badge-ghost"
                   )
                 ]}>
                   {if setting.value, do: "Enabled", else: "Disabled"}
                 </span>
               </div>
-              <p class="mt-2 text-xs text-gray-600">
+              <p class="mt-2 text-xs text-base-content/70">
                 Last updated: {Calendar.strftime(setting.updated_at, "%B %d, %Y at %H:%M")}
               </p>
             </div>
@@ -183,10 +176,10 @@ defmodule Admin.PlatformSettingsLive do
         </div>
 
         <!-- Database Management Section -->
-        <div class="mt-8 bg-white shadow rounded-lg">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h3 class="text-lg font-medium text-gray-900">Database Management</h3>
-            <p class="mt-1 text-sm text-gray-600">
+        <div class="mt-8 bg-base-100 shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-base-300">
+            <h3 class="text-lg font-medium text-base-content">Database Management</h3>
+            <p class="mt-1 text-sm text-base-content/70">
               Manage database content and seeding operations
             </p>
           </div>
@@ -194,10 +187,10 @@ defmodule Admin.PlatformSettingsLive do
           <div class="px-6 py-4">
             <div class="flex items-center justify-between">
               <div class="flex-1">
-                <h4 class="text-sm font-medium text-gray-900">
+                <h4 class="text-sm font-medium text-base-content">
                   Create Test Data
                 </h4>
-                <p class="text-sm text-gray-600">
+                <p class="text-sm text-base-content/70">
                   Create essential test data including subscription plans, users, blog posts, and more.
                   Safe for production - only creates data that doesn't already exist.
                 </p>

@@ -36,7 +36,7 @@ defmodule Admin.CompaniesLive do
       |> PageMeta.assign_metadata(
         title: "Companies Management",
         description: "Manage companies across the application",
-        url: "/dashboard/super_admin/companies"
+        url: "/dashboard/companies"
       )
 
     {:ok, load_companies(socket, 1)}
@@ -243,13 +243,6 @@ defmodule Admin.CompaniesLive do
     {:noreply, assign(socket, show_drawer: false)}
   end
 
-  @impl true
-  def handle_params(_params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-    {:noreply, socket}
-  end
-
   defp load_companies(socket, page) do
     per_page = 10
 
@@ -287,18 +280,18 @@ defmodule Admin.CompaniesLive do
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 h-[calc(100vh-200px)]">
         <div class="h-[calc(100vh-200px)] col-span-1">
           <h2 class="text-xl font-semibold mb-4">Company List</h2>
-          <div class="divide-y">
+          <div class="divide-y divide-base-300">
             <%= for company <- @companies do %>
-              <div class={"cursor-pointer p-3 rounded-md hover:bg-gray-50 relative #{if @selected_company && @selected_company.id == company.id, do: "bg-gray-100 border-l-4 border-blue-500", else: ""}"}
+              <div class={"cursor-pointer p-3 rounded-md hover:bg-base-200 relative #{if @selected_company && @selected_company.id == company.id, do: "bg-base-200 border-l-4 border-primary", else: ""}"}
                 phx-click="select_company"
                 phx-value-id={company.id}
               >
                 <!-- Company content -->
                 <div class="flex justify-between items-center">
-                  <h4 class="text-sm font-medium text-gray-900">{company.name}</h4>
+                  <h4 class="text-sm font-medium text-base-content">{company.name}</h4>
                 </div>
                 <div class="mt-1">
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-base-content/70">
                     Created: {Calendar.strftime(company.inserted_at, "%B %d, %Y at %H:%M")}
                   </p>
                 </div>
@@ -341,7 +334,7 @@ defmodule Admin.CompaniesLive do
           <%= if @selected_company do %>
             {render_company_details(assign(assigns, :context, "desktop"))}
           <% else %>
-            <p class="text-gray-500">Select a company to view details</p>
+            <p class="text-base-content/70">Select a company to view details</p>
           <% end %>
         </div>
       </div>
@@ -384,33 +377,33 @@ defmodule Admin.CompaniesLive do
         <div class="space-y-4 p-2">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Company Name</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Company Name</h4>
               <p class="mt-1">{@selected_company.name}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Description</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Description</h4>
               <p class="mt-1">{@selected_company.description || "No description provided"}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Contact Email</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Contact Email</h4>
               <p class="mt-1">{@selected_company.email || "No email provided"}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Phone</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Phone</h4>
               <p class="mt-1">{@selected_company.phone || "No phone provided"}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Address</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Address</h4>
               <p class="mt-1">{@selected_company.address || "No address provided"}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Website</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Website</h4>
               <p class="mt-1">
                 <%= if @selected_company.website do %>
                   <a
                     href={@selected_company.website}
                     target="_blank"
-                    class="text-primary-600 hover:text-primary-700"
+                    class="link link-primary"
                   >
                     {@selected_company.website}
                   </a>
@@ -447,22 +440,22 @@ defmodule Admin.CompaniesLive do
       <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
         <div class="space-y-4 p-2">
           <%= if Enum.any?(@selected_company.employees) do %>
-            <div class="divide-y">
+            <div class="divide-y divide-base-300">
               <%= for employee <- @selected_company.employees do %>
                 <div class="flex items-center justify-between py-2">
                   <div>
                     <p class="font-medium">
                       {employee.profile.first_name} {employee.profile.last_name}
                     </p>
-                    <p class="text-sm text-gray-500">{employee.email}</p>
-                    <p class="text-sm text-gray-500">Position: {employee.position}</p>
-                    <p class="text-sm text-gray-500">Department: {employee.department}</p>
+                    <p class="text-sm text-base-content/70">{employee.email}</p>
+                    <p class="text-sm text-base-content/70">Position: {employee.position}</p>
+                    <p class="text-sm text-base-content/70">Department: {employee.department}</p>
                   </div>
                 </div>
               <% end %>
             </div>
           <% else %>
-            <p class="text-gray-500">No employees found for this company</p>
+            <p class="text-base-content/70">No employees found for this company</p>
           <% end %>
         </div>
       </div>

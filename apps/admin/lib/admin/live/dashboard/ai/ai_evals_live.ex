@@ -21,7 +21,7 @@ defmodule Admin.AiEvalsLive do
     {:ok,
      socket
      |> assign(:show_drawer, false)
-     |> assign(:drawer_mode, "create")
+     |> assign(:drawer_mode, nil)
      |> assign(:selected_item, nil)
      |> assign(:available_models, Models.available_models())
      |> assign(:selected_model, Models.default_model_display_name())
@@ -50,15 +50,12 @@ defmodule Admin.AiEvalsLive do
      |> PageMeta.assign_metadata(
        title: "AI Evaluations",
        description: "Manage AI evaluations",
-       url: "/dashboard/super_admin/ai-evals"
+       url: "/dashboard/ai-evals"
      )}
   end
 
   @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     page = String.to_integer(Map.get(params, "page", "1"))
 
     {:noreply,
@@ -117,6 +114,7 @@ defmodule Admin.AiEvalsLive do
      socket
      |> assign(:show_drawer, false)
      |> assign(:selected_item, nil)
+     |> assign(:drawer_mode, nil)
      |> assign(:test_cases, [])}
   end
 
@@ -595,6 +593,8 @@ defmodule Admin.AiEvalsLive do
               top_p={@top_p}
               top_p_active={@top_p_active}
             />
+          <% nil -> %>
+            <%# Render nothing when drawer_mode is nil %>
         <% end %>
         </div>
         <form method="dialog" class="modal-backdrop" phx-click="close_drawer">
@@ -628,11 +628,11 @@ defmodule Admin.AiEvalsLive do
   defp empty_state(assigns) do
     ~H"""
     <div class="text-center py-12">
-      <div class="mx-auto h-12 w-12 text-gray-400">
+      <div class="mx-auto h-12 w-12 text-base-content/40">
         <.icon name="hero-clipboard-document-check" class="h-12 w-12" />
       </div>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">{@title}</h3>
-      <p class="mt-1 text-sm text-gray-500">{@description}</p>
+      <h3 class="mt-2 text-sm font-medium text-base-content">{@title}</h3>
+      <p class="mt-1 text-sm text-base-content/70">{@description}</p>
       <div class="mt-6">
         <button phx-click={@action_event} class="btn btn-neutral">
           <.icon name="hero-plus" class="h-4 w-4 mr-2" />
@@ -655,7 +655,7 @@ defmodule Admin.AiEvalsLive do
               </h3>
               <span class={[
                 "badge",
-                (if eval.is_active, do: "badge-success", else: "badge-error")
+                (if eval.is_active, do: "badge-success", else: "badge-ghost")
               ]}>
                 {if eval.is_active, do: "Active", else: "Inactive"}
               </span>
@@ -1418,8 +1418,10 @@ defmodule Admin.AiEvalsLive do
   defp get_drawer_title("create_eval"), do: "Create New Evaluation"
   defp get_drawer_title("edit_eval"), do: "Edit Evaluation"
   defp get_drawer_title("run_eval"), do: "Run Evaluation"
+  defp get_drawer_title(_), do: ""
 
   defp get_drawer_description("create_eval"), do: "Create a new AI evaluation for your collection"
   defp get_drawer_description("edit_eval"), do: "Edit the selected AI evaluation"
   defp get_drawer_description("run_eval"), do: "Run evaluation against selected model"
+  defp get_drawer_description(_), do: ""
 end

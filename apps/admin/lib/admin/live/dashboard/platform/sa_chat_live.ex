@@ -1,4 +1,4 @@
-defmodule Admin.Admin.ChatDashboardLive do
+defmodule Admin.ChatLive do
   @moduledoc """
   LiveView for super admin chat management.
 
@@ -39,18 +39,9 @@ defmodule Admin.Admin.ChatDashboardLive do
      |> PageMeta.assign_metadata(
        title: "Chat Management",
        description: "Manage customer support chat sessions",
-       url: "/dashboard/super_admin/chat"
+       url: "/dashboard/chat"
      )
      |> load_sessions(1)}
-  end
-
-  @impl true
-  def handle_params(_params, url, socket) do
-    # Update current path for breadcrumbs
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
-    {:noreply, socket}
   end
 
   defp load_sessions(socket, page) do
@@ -321,11 +312,11 @@ defmodule Admin.Admin.ChatDashboardLive do
 
           <%= if Enum.empty?(@active_sessions) do %>
             <div class="text-center py-4">
-              <p class="text-sm text-gray-500">No active chat sessions</p>
+              <p class="text-sm text-base-content/70">No active chat sessions</p>
             </div>
           <% else %>
             <%= for session <- @active_sessions do %>
-              <div class={["cursor-pointer", "p-3", "rounded-md", "hover:bg-gray-50", "relative", (@selected_session && @selected_session.id == session.id) && "bg-gray-100 border-l-4 border-blue-500"]}>
+              <div class={["cursor-pointer", "p-3", "rounded-md", "hover:bg-base-200", "relative", (@selected_session && @selected_session.id == session.id) && "bg-base-200 border-l-4 border-primary"]}>
                 <div
                   class="hidden lg:block h-full w-full absolute inset-0"
                   phx-click="select_session"
@@ -340,19 +331,19 @@ defmodule Admin.Admin.ChatDashboardLive do
                 >
                 </div>
                 <div class="flex justify-between items-center">
-                  <h4 class="text-sm font-medium text-gray-900">
+                  <h4 class="text-sm font-medium text-base-content">
                     <%= if session.user_id do %>
                       {session.user.email}
                     <% else %>
                       {session.anonymous_name}
                     <% end %>
                   </h4>
-                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{if session.status == "active", do: "bg-green-100 text-green-800", else: "bg-gray-100 text-gray-800"}"}>
+                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{if session.status == "active", do: "badge badge-success", else: "badge badge-ghost"}"}>
                     {session.status}
                   </span>
                 </div>
                 <div class="mt-1">
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-base-content/70">
                     Started: {Calendar.strftime(session.started_at, "%B %d, %Y at %H:%M")}
                   </p>
                 </div>
@@ -389,11 +380,11 @@ defmodule Admin.Admin.ChatDashboardLive do
           <%= if @selected_session do %>
             {render_chat_details(assign(assigns, :context, "desktop"))}
           <% else %>
-            <div class="bg-white overflow-hidden shadow rounded-lg h-full flex flex-col justify-center items-center">
+            <div class="bg-base-100 overflow-hidden shadow rounded-lg h-full flex flex-col justify-center items-center">
               <div class="flex flex-col items-center justify-center text-center p-8">
-                <.icon name="hero-chat-bubble-oval-left" class="h-16 w-16 text-gray-400" />
-                <h3 class="mt-4 text-lg font-medium text-gray-900">No chat session selected</h3>
-                <p class="mt-2 text-base text-gray-500 max-w-md">
+                <.icon name="hero-chat-bubble-oval-left" class="h-16 w-16 text-base-content/40" />
+                <h3 class="mt-4 text-lg font-medium text-base-content">No chat session selected</h3>
+                <p class="mt-2 text-base text-base-content/70 max-w-md">
                   Select a chat session from the list to view and respond to messages.
                 </p>
               </div>
@@ -477,9 +468,9 @@ defmodule Admin.Admin.ChatDashboardLive do
                   class={["flex", message.sender_type == "admin" && "justify-end" || "justify-start"]}
                   id={msg_id}
                 >
-                  <div class={["max-w-3/4", "px-4", "py-2", "rounded-lg", message.sender_type == "admin" && "bg-blue-100" || "bg-gray-100"]}>
+                  <div class={["max-w-3/4", "px-4", "py-2", "rounded-lg", message.sender_type == "admin" && "bg-info/20" || "bg-base-200"]}>
                     <div class="text-sm">{message.content}</div>
-                    <div class="text-xs text-gray-500 mt-1">
+                    <div class="text-xs text-base-content/70 mt-1">
                       {Calendar.strftime(message.inserted_at, "%H:%M")}
                     </div>
                   </div>
@@ -490,7 +481,7 @@ defmodule Admin.Admin.ChatDashboardLive do
 
           <%= if @selected_session.status == "active" do %>
             <div
-              class="pt-3 sticky bottom-0 bg-white border-t mt-auto"
+              class="pt-3 sticky bottom-0 bg-base-100 border-t border-base-300 mt-auto"
               id={"admin-chat-typing-desktop-#{@selected_session.id}"}
               phx-hook="AdminChatTyping"
               data-session-id={@selected_session.id}
@@ -521,31 +512,31 @@ defmodule Admin.Admin.ChatDashboardLive do
       <div role="tabpanel" class="tab-content bg-base-100 border-base-300 rounded-box p-6">
         <div class="space-y-2 p-2">
           <div>
-            <h3 class="text-lg font-medium text-gray-900 mb-3">Session Information</h3>
+            <h3 class="text-lg font-medium text-base-content mb-3">Session Information</h3>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Session ID</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Session ID</h4>
                 <p class="mt-1">{@selected_session.id}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Status</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Status</h4>
                 <div class="mt-1">
-                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{if @selected_session.status == :active, do: "bg-green-100 text-green-800", else: "bg-red-100 text-red-800"}"}>
+                  <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{if @selected_session.status == :active, do: "badge badge-success", else: "badge badge-error"}"}>
                     {@selected_session.status}
                   </span>
                 </div>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Started At</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Started At</h4>
                 <p class="mt-1">
                   {Calendar.strftime(@selected_session.started_at, "%B %d, %Y at %I:%M %p")}
                 </p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Last Activity</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Last Activity</h4>
                 <p class="mt-1">
                   <%= if @selected_session.messages && length(@selected_session.messages) > 0 do %>
                     <% latest_message =
@@ -560,12 +551,12 @@ defmodule Admin.Admin.ChatDashboardLive do
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Message Count</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Message Count</h4>
                 <p class="mt-1">{length(@selected_session.messages)}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">User Information</h4>
+                <h4 class="text-sm font-medium text-base-content/70">User Information</h4>
                 <p class="mt-1">
                   <%= if @selected_session.user_id do %>
                     User ID: {@selected_session.user_id}
@@ -578,52 +569,52 @@ defmodule Admin.Admin.ChatDashboardLive do
           </div>
 
           <div>
-            <h3 class="text-lg font-medium text-gray-900 mb-3">Device Information</h3>
+            <h3 class="text-lg font-medium text-base-content mb-3">Device Information</h3>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Operating System</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Operating System</h4>
                 <p class="mt-1">{@selected_session.device_os || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Browser</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Browser</h4>
                 <p class="mt-1">{@selected_session.device_browser || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Device Type</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Device Type</h4>
                 <p class="mt-1">{@selected_session.device_type || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Screen Resolution</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Screen Resolution</h4>
                 <p class="mt-1">{@selected_session.screen_resolution || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Timezone</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Timezone</h4>
                 <p class="mt-1">{@selected_session.timezone || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Language</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Language</h4>
                 <p class="mt-1">{@selected_session.language || "Unknown"}</p>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">IP Address</h4>
+                <h4 class="text-sm font-medium text-base-content/70">IP Address</h4>
                 <p class="mt-1">{@selected_session.ip_address || "Unknown"}</p>
               </div>
 
               <div class="col-span-2">
-                <h4 class="text-sm font-medium text-gray-500">User Agent</h4>
+                <h4 class="text-sm font-medium text-base-content/70">User Agent</h4>
                 <p class="mt-1 text-sm break-all">{@selected_session.user_agent || "Unknown"}</p>
               </div>
             </div>
           </div>
 
           <%= if @selected_session.status == "active" do %>
-            <div class="py-4 border-t">
+            <div class="py-4 border-t border-base-300">
               <button phx-click="close_session" class="btn btn-error w-full">
                 Close Session
               </button>
@@ -643,7 +634,7 @@ defmodule Admin.Admin.ChatDashboardLive do
             show_timestamps={true}
           />
         <% else %>
-          <p class="text-gray-500 text-center py-4">No session selected</p>
+          <p class="text-base-content/70 text-center py-4">No session selected</p>
         <% end %>
         </div>
       </div>

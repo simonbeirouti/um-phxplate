@@ -462,7 +462,7 @@ defmodule Core.Accounts.UserNotifier do
       customer_name: customer_name,
       message_content: message_content,
       session_id: session_id,
-                chat_url: "#{EndpointHelper.admin_url()}/dashboard/super_admin/chat",
+                chat_url: "#{EndpointHelper.admin_url()}/dashboard/chat",
       recipient_email: current_support_email
     }
 

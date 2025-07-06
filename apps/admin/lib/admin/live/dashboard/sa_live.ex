@@ -71,16 +71,8 @@ defmodule Admin.SuperAdminLive do
      |> PageMeta.assign_metadata(
        title: "Super Admin Dashboard",
        description: "Super Admin Dashboard",
-       url: "/dashboard/super_admin"
+       url: "/dashboard"
      )}
-  end
-
-  @impl true
-  def handle_params(_params, url, socket) do
-    uri = URI.parse(url)
-    layout_data = Map.get(socket.assigns, :layout_data, %{})
-    socket = assign(socket, :layout_data, Map.put(layout_data, :current_path, uri.path))
-    {:noreply, socket}
   end
 
   @impl true

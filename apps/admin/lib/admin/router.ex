@@ -76,7 +76,7 @@ defmodule Admin.Router do
         {Admin.Live.Hooks.LayoutHooks, :default}
       ] do
       live "/chat", ChatLive, :index
-      live "/feature-feedbacks", FeatureFeedbacksLive, :index
+      live "/feature-feedbacks", FeedbackRequestsLive, :index
       live "/users", UsersLive, :index
     end
 

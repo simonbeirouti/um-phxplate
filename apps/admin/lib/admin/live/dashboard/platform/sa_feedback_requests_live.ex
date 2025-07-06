@@ -29,15 +29,6 @@ defmodule Admin.FeedbackRequestsLive do
     {:ok, load_requests(socket, 1)}
   end
 
-  @impl true
-  def handle_params(_params, url, socket) do
-    # Update current path for breadcrumbs
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
-    {:noreply, socket}
-  end
-
   defp load_requests(socket, page) do
     per_page = 10
     request_type = socket.assigns[:request_type] || "All"
@@ -86,49 +77,49 @@ defmodule Admin.FeedbackRequestsLive do
       <div class="grid grid-cols-1 lg:grid-cols-2 lg:gap-8 mt-4 h-[calc(100vh-200px)]">
         <div class="h-[calc(100vh-200px)] col-span-1">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold">Requests</h2>
-            <form phx-change="filter_requests" class="w-auto">
-              <select id="request-filter" name="type" class="select select-bordered w-32" phx-change="filter_requests">
-                <option value="All" selected={@request_type == "All"}>All</option>
-                <option value="Features" selected={@request_type == "Features"}>Features</option>
-                <option value="Feedback" selected={@request_type == "Feedback"}>Feedback</option>
-              </select>
-            </form>
-          </div>
+          <h2 class="text-xl font-semibold">Requests</h2>
+          <form phx-change="filter_requests" class="w-auto">
+            <select id="request-filter" name="type" class="select select-bordered w-32" phx-change="filter_requests">
+              <option value="All" selected={@request_type == "All"}>All</option>
+              <option value="Features" selected={@request_type == "Features"}>Features</option>
+              <option value="Feedback" selected={@request_type == "Feedback"}>Feedback</option>
+            </select>
+          </form>
+        </div>
 
-          <%= if Enum.empty?(@requests) do %>
-            <div class="p-4 bg-gray-50 rounded-md">
-              <p class="text-gray-500 text-center">No requests available</p>
-            </div>
-          <% else %>
-            <div class="divide-y">
-              <%= for request <- @requests do %>
-                <div class={"cursor-pointer p-3 rounded-md hover:bg-gray-50 relative #{if @selected_request && @selected_request.id == request.id, do: "bg-gray-100 border-l-4 border-blue-500", else: ""}"}
-                  phx-click="select_request"
-                  phx-value-id={request.id}
-                >
-                  <!-- Request content -->
-                  <div class="flex items-center justify-between">
-                    <div class="flex flex-col space-y-1 flex-1">
-                      <div class="flex items-center justify-between">
-                        <p class="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                          <%= Admin.Components.Markdown.excerpt(request.feature_description, 30) %>
-                        </p>
-                        <span class={[
-                          "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                          case request.feasibility_rating do
-                            1 -> "bg-blue-100 text-blue-800"
-                            2 -> "bg-purple-100 text-purple-800"
-                            _ -> "bg-gray-100 text-gray-800"
-                          end
-                        ]}>
-                          <%= if request.feasibility_rating == 1, do: "Feature", else: "Feedback" %>
-                        </span>
-                      </div>
-                      <div class="mt-1">
-                        <p class="text-xs text-gray-500">
-                          Priority: <%= request.priority_rating %>/10 • <%= Calendar.strftime(request.inserted_at, "%B %d, %Y at %H:%M") %>
-                        </p>
+        <%= if Enum.empty?(@requests) do %>
+          <div class="p-4 bg-base-200 rounded-md">
+            <p class="text-base-content/70 text-center">No requests available</p>
+          </div>
+        <% else %>
+          <div class="divide-y divide-base-300">
+            <%= for request <- @requests do %>
+              <div class={"cursor-pointer p-3 rounded-md hover:bg-base-200 relative #{if @selected_request && @selected_request.id == request.id, do: "bg-base-200 border-l-4 border-primary", else: ""}"}
+                phx-click="select_request"
+                phx-value-id={request.id}
+              >
+                <!-- Request content -->
+                <div class="flex items-center justify-between">
+                  <div class="flex flex-col space-y-1 flex-1">
+                    <div class="flex items-center justify-between">
+                      <p class="text-sm font-medium text-base-content truncate max-w-[200px]">
+                        <%= Admin.Components.Markdown.excerpt(request.feature_description, 30) %>
+                      </p>
+                      <span class={[
+                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                        case request.feasibility_rating do
+                          1 -> "badge badge-info"
+                          2 -> "badge badge-primary"
+                          _ -> "badge badge-ghost"
+                        end
+                      ]}>
+                        <%= if request.feasibility_rating == 1, do: "Feature", else: "Feedback" %>
+                      </span>
+                    </div>
+                    <div class="mt-1">
+                      <p class="text-xs text-base-content/70">
+                        Priority: <%= request.priority_rating %>/10 • <%= Calendar.strftime(request.inserted_at, "%B %d, %Y at %H:%M") %>
+                      </p>
                       </div>
                     </div>
                   </div>
@@ -172,7 +163,7 @@ defmodule Admin.FeedbackRequestsLive do
           <%= if @selected_request do %>
             {render_request_details(assign(assigns, :context, "desktop"))}
           <% else %>
-            <p class="text-gray-500">Select a request to view details</p>
+            <p class="text-base-content/70">Select a request to view details</p>
           <% end %>
         </div>
       </div>
@@ -191,7 +182,7 @@ defmodule Admin.FeedbackRequestsLive do
               <%= if @selected_request do %>
                 {render_request_details(assign(assigns, :context, "mobile"))}
               <% else %>
-                <p class="text-gray-500">Select a request to view details</p>
+                <p class="text-base-content/70">Select a request to view details</p>
               <% end %>
             </div>
           </div>
@@ -220,9 +211,9 @@ defmodule Admin.FeedbackRequestsLive do
               <span class={[
                 "px-2 py-1 rounded-md text-sm font-medium",
                 case @selected_request.feasibility_rating do
-                  1 -> "bg-blue-100 text-blue-800"
-                  2 -> "bg-purple-100 text-purple-800"
-                  _ -> "bg-gray-100 text-gray-800"
+                  1 -> "badge badge-info"
+                  2 -> "badge badge-primary"
+                  _ -> "badge badge-ghost"
                 end
               ]}>
                 Priority: {@selected_request.priority_rating}/10
@@ -230,22 +221,22 @@ defmodule Admin.FeedbackRequestsLive do
             </div>
 
             <div class="mb-6">
-              <h4 class="text-sm font-medium text-gray-500 mb-1">Submitted</h4>
+              <h4 class="text-sm font-medium text-base-content/70 mb-1">Submitted</h4>
               <p class="text-sm">
                 <%= Calendar.strftime(@selected_request.inserted_at, "%Y-%m-%d at %H:%M:%S") %>
               </p>
             </div>
 
             <div class="mb-6">
-              <h4 class="text-sm font-medium text-gray-500 mb-1">User</h4>
+              <h4 class="text-sm font-medium text-base-content/70 mb-1">User</h4>
               <p class="text-sm">
                 <%= if @selected_request.user, do: @selected_request.user.email, else: "Anonymous" %>
               </p>
             </div>
 
             <div>
-              <h4 class="text-sm font-medium text-gray-500 mb-2">Description</h4>
-              <div class="p-4 bg-gray-50 rounded-md text-sm">
+              <h4 class="text-sm font-medium text-base-content/70 mb-2">Description</h4>
+              <div class="p-4 bg-base-200 rounded-md text-sm">
                 <%= @selected_request.feature_description %>
               </div>
             </div>
@@ -258,14 +249,14 @@ defmodule Admin.FeedbackRequestsLive do
         <div class="p-2">
           <%= if @delete_confirmation do %>
             <div class="space-y-4">
-              <div class="bg-red-50 border border-red-200 rounded-md p-4">
+              <div class="bg-error/10 border border-error/20 rounded-md p-4">
                 <div class="flex items-start">
                   <div class="flex-shrink-0">
-                    <.icon name="hero-exclamation-triangle" class="h-5 w-5 text-red-400" />
+                    <.icon name="hero-exclamation-triangle" class="h-5 w-5 text-error" />
                   </div>
                   <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">Confirm Deletion</h3>
-                    <div class="mt-2 text-sm text-red-700">
+                    <h3 class="text-sm font-medium text-error-content">Confirm Deletion</h3>
+                    <div class="mt-2 text-sm text-error-content/80">
                       <p>
                         Are you sure you want to delete this request? This action cannot be undone.
                       </p>
@@ -290,7 +281,7 @@ defmodule Admin.FeedbackRequestsLive do
             </div>
           <% else %>
             <div class="space-y-4">
-              <p class="text-gray-700">To delete this request, click the button below.</p>
+              <p class="text-base-content/80">To delete this request, click the button below.</p>
               <div class="flex justify-end">
                 <button type="button" class="btn btn-error" phx-click="confirm_delete">
                   Delete Request

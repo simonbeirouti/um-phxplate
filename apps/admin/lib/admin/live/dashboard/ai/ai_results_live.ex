@@ -12,7 +12,7 @@ defmodule Admin.AiResultsLive do
   use Admin, :live_view
   alias Core.AI
   alias Admin.PageMeta
-  alias Admin.Components.AI.ModelSelector
+  alias Admin.Components.ModelSelector
 
   @time_range_options [
     {"Last 7 days", 7},
@@ -56,15 +56,12 @@ defmodule Admin.AiResultsLive do
      |> PageMeta.assign_metadata(
        title: "AI Results",
        description: "View AI model usage statistics and timeline",
-       url: "/dashboard/super_admin/ai-results"
+       url: "/dashboard/ai-results"
      )}
   end
 
   @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     page = String.to_integer(Map.get(params, "page", "1"))
     errors_page = String.to_integer(Map.get(params, "errors_page", "1"))
     model = Map.get(params, "model", "All Models")
@@ -141,7 +138,7 @@ defmodule Admin.AiResultsLive do
      |> assign(:errors_page, 1)
      |> assign(:filter_reset_key, socket.assigns.filter_reset_key + 1)
      |> load_usage_data()
-     |> push_patch(to: ~p"/dashboard/super_admin/ai-results")}
+     |> push_patch(to: ~p"/dashboard/ai-results")}
   end
 
   @impl true
@@ -299,12 +296,12 @@ defmodule Admin.AiResultsLive do
         <%= if Enum.empty?(@all_models_stats) do %>
           <.empty_state />
         <% else %>
-          <div class="bg-white shadow rounded-lg">
+          <div class="bg-base-100 shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Model Performance</h3>
+              <h3 class="text-lg leading-6 font-medium text-base-content mb-4">Model Performance</h3>
               <.table rows={@all_models_stats} id="models-table">
                 <:col :let={stats} label="Model">
-                  <span class="font-medium text-gray-900">
+                  <span class="font-medium text-base-content">
                     {model_display_name(stats.model)}
                   </span>
                 </:col>
@@ -327,7 +324,7 @@ defmodule Admin.AiResultsLive do
                   {format_number(stats.total_tokens)}
                 </:col>
                 <:col :let={stats} label="Errors" align="right">
-                  <span class="text-red-600">
+                  <span class="text-error">
                     {format_number((stats.error_requests || 0) + (stats.timeout_requests || 0))}
                   </span>
                 </:col>
@@ -339,12 +336,12 @@ defmodule Admin.AiResultsLive do
 
       <%= if @errors_result.total_count > 0 do %>
         <div class="mt-6">
-          <div class="bg-white shadow rounded-lg">
+          <div class="bg-base-100 shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                <h3 class="text-lg leading-6 font-medium text-base-content">
                   Recent Errors
-                  <span class="text-sm font-normal text-gray-500">
+                  <span class="text-sm font-normal text-base-content/70">
                     ({@errors_result.total_count} total
                     <%= if @errors_result.total_pages > 1 do %>
                       • Page {@errors_result.page} of {@errors_result.total_pages}
@@ -403,7 +400,7 @@ defmodule Admin.AiResultsLive do
                       <div></div>
                     <% end %>
 
-                    <span class="text-sm text-gray-700">
+                    <span class="text-sm text-base-content/80">
                       Page {@errors_result.page} of {@errors_result.total_pages}
                     </span>
 
@@ -494,7 +491,7 @@ defmodule Admin.AiResultsLive do
   # Metric Card Component
   defp metric_card(assigns) do
     ~H"""
-    <div class="bg-white overflow-hidden shadow rounded-lg">
+    <div class="bg-base-100 overflow-hidden shadow rounded-lg">
       <div class="p-5">
         <div class="flex items-center">
           <div class="flex-shrink-0">
@@ -502,8 +499,8 @@ defmodule Admin.AiResultsLive do
           </div>
           <div class="ml-5 w-0 flex-1">
             <dl>
-              <dt class="text-sm font-medium text-gray-500 truncate">{@title}</dt>
-              <dd class={"text-lg font-medium #{Map.get(assigns, :value_class, "text-gray-900")}"}>
+              <dt class="text-sm font-medium text-base-content/70 truncate">{@title}</dt>
+              <dd class={"text-lg font-medium #{Map.get(assigns, :value_class, "text-base-content")}"}>
                 {@value}
               </dd>
             </dl>
@@ -516,37 +513,37 @@ defmodule Admin.AiResultsLive do
 
   defp metric_icon(%{name: "message-circle"} = assigns) do
     ~H"""
-    <.icon name="hero-chat-bubble-oval-left" class="h-6 w-6 text-gray-400" />
+    <.icon name="hero-chat-bubble-oval-left" class="h-6 w-6 text-base-content/40" />
     """
   end
 
   defp metric_icon(%{name: "check-circle"} = assigns) do
     ~H"""
-    <.icon name="hero-check-circle" class="h-6 w-6 text-green-400" />
+    <.icon name="hero-check-circle" class="h-6 w-6 text-success" />
     """
   end
 
   defp metric_icon(%{name: "cpu"} = assigns) do
     ~H"""
-    <.icon name="hero-cpu-chip" class="h-6 w-6 text-blue-400" />
+    <.icon name="hero-cpu-chip" class="h-6 w-6 text-info" />
     """
   end
 
   defp metric_icon(%{name: "clock"} = assigns) do
     ~H"""
-    <.icon name="hero-clock" class="h-6 w-6 text-yellow-400" />
+    <.icon name="hero-clock" class="h-6 w-6 text-warning" />
     """
   end
 
   # Empty State Component
   defp empty_state(assigns) do
     ~H"""
-    <div class="text-center py-12 bg-white shadow rounded-lg">
-      <div class="mx-auto h-12 w-12 text-gray-400">
+    <div class="text-center py-12 bg-base-100 shadow rounded-lg">
+      <div class="mx-auto h-12 w-12 text-base-content/40">
         <.icon name="hero-signal" class="h-12 w-12" />
       </div>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No usage data found</h3>
-      <p class="mt-1 text-sm text-gray-500">
+      <h3 class="mt-2 text-sm font-medium text-base-content">No usage data found</h3>
+      <p class="mt-1 text-sm text-base-content/70">
         Start using AI features to see usage statistics here.
       </p>
     </div>
@@ -559,8 +556,9 @@ defmodule Admin.AiResultsLive do
   defp error_details(assigns) do
     ~H"""
     <div class="space-y-6">
+      <%= if @error do %>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Status</dt>
+        <dt class="text-sm font-medium text-base-content/70">Status</dt>
         <dd class="mt-1">
           <span class={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{status_badge_class(@error.status)}"}>
             {String.capitalize(@error.status)}
@@ -568,22 +566,22 @@ defmodule Admin.AiResultsLive do
         </dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Model</dt>
-        <dd class="mt-1 text-sm text-gray-900">{model_display_name(@error.model)}</dd>
+        <dt class="text-sm font-medium text-base-content/70">Model</dt>
+        <dd class="mt-1 text-sm text-base-content">{model_display_name(@error.model)}</dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Action</dt>
-        <dd class="mt-1 text-sm text-gray-900">{@error.action}</dd>
+        <dt class="text-sm font-medium text-base-content/70">Action</dt>
+        <dd class="mt-1 text-sm text-base-content">{@error.action}</dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Error Message</dt>
-        <dd class="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md">
+        <dt class="text-sm font-medium text-base-content/70">Error Message</dt>
+        <dd class="mt-1 text-sm text-base-content bg-base-200 p-3 rounded-md">
           {@error.error_message}
         </dd>
       </div>
       <div>
-        <dt class="text-sm font-medium text-gray-500">Timestamp</dt>
-        <dd class="mt-1 text-sm text-gray-900">
+        <dt class="text-sm font-medium text-base-content/70">Timestamp</dt>
+        <dd class="mt-1 text-sm text-base-content">
           <span data-utc-time={@error.inserted_at} id={"error-detail-time-#{@error.id}"} phx-hook="TimezoneDetector">
             {format_datetime(@error.inserted_at)}
           </span>
@@ -591,20 +589,20 @@ defmodule Admin.AiResultsLive do
       </div>
       <%= if @error.user do %>
         <div>
-          <dt class="text-sm font-medium text-gray-500">User</dt>
-          <dd class="mt-1 text-sm text-gray-900">{@error.user.email}</dd>
+          <dt class="text-sm font-medium text-base-content/70">User</dt>
+          <dd class="mt-1 text-sm text-base-content">{@error.user.email}</dd>
         </div>
       <% end %>
       <%= if @error.response_time do %>
         <div>
-          <dt class="text-sm font-medium text-gray-500">Response Time</dt>
-          <dd class="mt-1 text-sm text-gray-900">{format_response_time(@error.response_time)}</dd>
+          <dt class="text-sm font-medium text-base-content/70">Response Time</dt>
+          <dd class="mt-1 text-sm text-base-content">{format_response_time(@error.response_time)}</dd>
         </div>
       <% end %>
       <%= if @error.metadata && map_size(@error.metadata) > 0 do %>
         <div>
-          <dt class="text-sm font-medium text-gray-500">Metadata</dt>
-          <dd class="mt-1 text-sm text-gray-900 bg-gray-50 p-3 rounded-md">
+          <dt class="text-sm font-medium text-base-content/70">Metadata</dt>
+          <dd class="mt-1 text-sm text-base-content bg-base-200 p-3 rounded-md">
             <pre class="whitespace-pre-wrap"><%= Jason.encode!(@error.metadata, pretty: true) %></pre>
           </dd>
         </div>
@@ -612,6 +610,9 @@ defmodule Admin.AiResultsLive do
       <div class="mt-4 w-full">
         <button phx-click="close_errors_drawer" class="btn btn-outline w-full">Close</button>
       </div>
+      <% else %>
+        <p>No error selected.</p>
+      <% end %>
     </div>
     """
   end
@@ -634,7 +635,7 @@ defmodule Admin.AiResultsLive do
       |> Enum.map(fn {k, v} -> "#{k}=#{v}" end)
       |> Enum.join("&")
 
-    base_path = "/dashboard/super_admin/ai-timeline"
+    base_path = "/dashboard/ai-timeline"
     if query_string == "", do: base_path, else: "#{base_path}?#{query_string}"
   end
 
@@ -867,12 +868,12 @@ defmodule Admin.AiResultsLive do
     end
   end
 
-  defp success_rate_class(rate) when rate >= 95, do: "text-green-600"
-  defp success_rate_class(rate) when rate >= 90, do: "text-yellow-600"
-  defp success_rate_class(_), do: "text-red-600"
+  defp success_rate_class(rate) when rate >= 95, do: "text-success"
+  defp success_rate_class(rate) when rate >= 90, do: "text-warning"
+  defp success_rate_class(_), do: "text-error"
 
-  defp status_badge_class("success"), do: "bg-green-100 text-green-800"
-  defp status_badge_class("error"), do: "bg-red-100 text-red-800"
-  defp status_badge_class("timeout"), do: "bg-yellow-100 text-yellow-800"
-  defp status_badge_class(_), do: "bg-gray-100 text-gray-800"
+  defp status_badge_class("success"), do: "badge-success"
+  defp status_badge_class("error"), do: "badge-error"
+  defp status_badge_class("timeout"), do: "badge-warning"
+  defp status_badge_class(_), do: "badge-ghost"
 end

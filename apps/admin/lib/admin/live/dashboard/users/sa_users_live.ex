@@ -54,7 +54,7 @@ defmodule Admin.UsersLive do
     |> PageMeta.assign_metadata(
       title: "User Management",
       description: "Manage users across the application",
-      url: "/dashboard/super_admin/users"
+      url: "/dashboard/users"
     )
   end
 
@@ -236,13 +236,6 @@ defmodule Admin.UsersLive do
   end
 
   @impl true
-  def handle_params(_params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_info({:created, %{type: :profile, profile: new_profile, global_scope: true}}, socket) do
     current_users = socket.assigns.users
     current_selected_user = socket.assigns.selected_user
@@ -308,21 +301,21 @@ defmodule Admin.UsersLive do
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 h-[calc(100vh-200px)]">
         <div class="h-[calc(100vh-200px)] col-span-1">
           <h2 class="text-xl font-semibold mb-4">User List</h2>
-          <div class="divide-y">
+          <div class="divide-y divide-base-300">
             <%= for user <- @users do %>
-              <div class={"cursor-pointer p-3 rounded-md hover:bg-gray-50 relative #{if @selected_user && @selected_user.id == user.id, do: "bg-gray-100 border-l-4 border-blue-500", else: ""}"}
+              <div class={"cursor-pointer p-3 rounded-md hover:bg-base-200 relative #{if @selected_user && @selected_user.id == user.id, do: "bg-base-200 border-l-4 border-primary", else: ""}"}
                 phx-click="select_user"
                 phx-value-id={user.id}
               >
                 <!-- User content -->
                 <div class="flex justify-between items-center">
-                  <h4 class="text-sm font-medium text-gray-900">{user.email}</h4>
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <h4 class="text-sm font-medium text-base-content">{user.email}</h4>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-base-200 text-base-content/80">
                     {user.role}
                   </span>
                 </div>
                 <div class="mt-1">
-                  <p class="text-xs text-gray-500">
+                  <p class="text-xs text-base-content/70">
                     ID: {user.id} • Created: {Calendar.strftime(user.inserted_at, "%B %d, %Y at %H:%M")}
                   </p>
                 </div>
@@ -335,7 +328,7 @@ defmodule Admin.UsersLive do
               <div class="join w-full flex justify-center items-center">
                 <%= if @page > 1 do %>
                   <button class="join-item btn" phx-click="paginate" phx-value-page={@page - 1}>
-                    <.icon name="arrow-left" class="w-3.5 h-3.5" />
+                    <.icon name="hero-arrow-left" class="w-3.5 h-3.5" />
                   </button>
                 <% end %>
 
@@ -351,7 +344,7 @@ defmodule Admin.UsersLive do
 
                 <%= if @page < @total_pages do %>
                   <button class="join-item btn" phx-click="paginate" phx-value-page={@page + 1}>
-                    <.icon name="arrow-right" class="w-3.5 h-3.5" />
+                    <.icon name="hero-arrow-right" class="w-3.5 h-3.5" />
                   </button>
                 <% end %>
               </div>
@@ -365,7 +358,7 @@ defmodule Admin.UsersLive do
           <%= if @selected_user do %>
             <%= render_user_details(assign(assigns, :context, "desktop")) %>
           <% else %>
-            <p class="text-gray-500">Select a user to view details</p>
+            <p class="text-base-content/70">Select a user to view details</p>
           <% end %>
         </div>
       </div>
@@ -417,32 +410,32 @@ defmodule Admin.UsersLive do
               </div>
               <div class="col-span-1 flex flex-col gap-4">
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">First Name</h4>
+                  <h4 class="text-sm font-medium text-base-content/70">First Name</h4>
                   <p class="mt-1">{@selected_user.profile.first_name || "Not provided"}</p>
                 </div>
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Last Name</h4>
+                  <h4 class="text-sm font-medium text-base-content/70">Last Name</h4>
                   <p class="mt-1">{@selected_user.profile.last_name || "Not provided"}</p>
                 </div>
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Phone</h4>
+                  <h4 class="text-sm font-medium text-base-content/70">Phone</h4>
                   <p class="mt-1">{@selected_user.profile.phone || "Not provided"}</p>
                 </div>
               </div>
               <div class="col-span-2">
-                <h4 class="text-sm font-medium text-gray-500">Bio</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Bio</h4>
                 <p class="mt-1">{@selected_user.profile.bio || "Not provided"}</p>
               </div>
               <div class="col-span-1">
-                <h4 class="text-sm font-medium text-gray-500">Location</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Location</h4>
                 <p class="mt-1">{@selected_user.profile.location || "Not provided"}</p>
               </div>
               <div class="col-span-1">
-                <h4 class="text-sm font-medium text-gray-500">Website</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Website</h4>
                 <p class="mt-1">{@selected_user.profile.website || "Not provided"}</p>
               </div>
               <div class="col-span-2">
-                <h4 class="text-sm font-medium text-gray-500">Social Links</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Social Links</h4>
                 <div class="mt-1 w-full flex justify-between">
                   <%= if @selected_user.profile.social_links && map_size(@selected_user.profile.social_links) > 0 do %>
                     <%= for {platform, url} <- @selected_user.profile.social_links do %>
@@ -454,7 +447,7 @@ defmodule Admin.UsersLive do
                       >
                         <button class="btn flex flex-row items-center gap-2 w-full">
                           <span class="capitalize">{platform}</span>
-                          <.icon name="arrow-top-right-on-square" class="w-3.5 h-3.5 ml-2" />
+                          <.icon name="hero-arrow-top-right-on-square" class="w-3.5 h-3.5 ml-2" />
                         </button>
                       </a>
                     <% end %>
@@ -465,7 +458,7 @@ defmodule Admin.UsersLive do
               </div>
             </div>
           <% else %>
-            <p class="text-gray-500">No profile information available</p>
+            <p class="text-base-content/70">No profile information available</p>
           <% end %>
         </div>
       </div>
@@ -475,11 +468,11 @@ defmodule Admin.UsersLive do
         <div class="space-y-4 p-2">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Email</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Email</h4>
               <p class="mt-1">{@selected_user.email}</p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Account Status</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Account Status</h4>
               <p class="mt-1">
                 {if @selected_user.confirmed_at, do: "Confirmed", else: "Pending Confirmation"}
               </p>
@@ -487,7 +480,7 @@ defmodule Admin.UsersLive do
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Role</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Role</h4>
               <form phx-change="update_role" class="mt-2">
                 <select
                   id={"role-select-#{@context}"}
@@ -503,7 +496,7 @@ defmodule Admin.UsersLive do
               </form>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Subscription Status</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Subscription Status</h4>
               <form phx-change="update_subscription_status" class="mt-2">
                 <select
                   id={"status-select-#{@context}"}
@@ -527,7 +520,7 @@ defmodule Admin.UsersLive do
               </form>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Current Plan</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Current Plan</h4>
               <form phx-change="update_subscription_tier" class="mt-2">
                 <select
                   id={"tier-select-#{@context}"}
@@ -550,7 +543,7 @@ defmodule Admin.UsersLive do
               </form>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Subscription End Date</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Subscription End Date</h4>
               <p class="mt-1">
                 <%= if @selected_user.subscription && @selected_user.subscription.subscription_period_end do %>
                   {Calendar.strftime(
@@ -565,7 +558,7 @@ defmodule Admin.UsersLive do
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Customer ID</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Customer ID</h4>
               <p class="mt-1">
                 <%= if @selected_user.subscription do %>
                   {@selected_user.subscription.stripe_customer_id}
@@ -575,7 +568,7 @@ defmodule Admin.UsersLive do
               </p>
             </div>
             <div>
-              <h4 class="text-sm font-medium text-gray-500">Subscription ID</h4>
+              <h4 class="text-sm font-medium text-base-content/70">Subscription ID</h4>
               <p class="mt-1">
                 <%= if @selected_user.subscription do %>
                   {@selected_user.subscription.stripe_subscription_id}
@@ -603,7 +596,7 @@ defmodule Admin.UsersLive do
             <% else %>
               <div class="flex w-full justify-between space-x-4">
                 <a class="btn w-full" href={~p"/dashboard/impersonate/#{@selected_user.id}"}>
-                  <.icon name="user-circle" class="-ml-0.5 mr-2 h-4 w-4" /> Impersonate User
+                  <.icon name="hero-user-circle" class="-ml-0.5 mr-2 h-4 w-4" /> Impersonate User
                 </a>
                 <button class="btn btn-error w-full" phx-click="delete_user">
                   Delete User Account

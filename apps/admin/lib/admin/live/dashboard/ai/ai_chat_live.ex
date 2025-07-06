@@ -52,15 +52,12 @@ defmodule Admin.AiChatLive do
      |> PageMeta.assign_metadata(
        title: "AI Chat",
        description: "Chat with AI and manage conversations",
-       url: "/dashboard/super_admin/ai-chat"
+       url: "/dashboard/ai-chat"
      )}
   end
 
   @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     # Handle conversation selection from URL
     case Map.get(params, "conversation_id") do
       nil ->
@@ -69,7 +66,7 @@ defmodule Admin.AiChatLive do
       conversation_id ->
         case AI.get_conversation(conversation_id, socket.assigns.current_user.id) do
           nil ->
-            {:noreply, push_navigate(socket, to: ~p"/dashboard/super_admin/ai-chat")}
+            {:noreply, push_navigate(socket, to: ~p"/dashboard/ai-chat")}
 
           conversation ->
             messages = convert_db_messages_to_display(conversation.messages)
@@ -118,7 +115,7 @@ defmodule Admin.AiChatLive do
          |> assign(:current_conversation, conversation)
          |> assign(:messages, [])
          |> assign(:show_mobile_drawer, false)
-         |> push_navigate(to: ~p"/dashboard/super_admin/ai-chat/#{conversation.id}")}
+         |> push_navigate(to: ~p"/dashboard/ai-chat/#{conversation.id}")}
 
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to create new conversation")}
@@ -130,7 +127,7 @@ defmodule Admin.AiChatLive do
     {:noreply,
      socket
      |> assign(:show_mobile_drawer, false)
-     |> push_navigate(to: ~p"/dashboard/super_admin/ai-chat/#{conversation_id}")}
+     |> push_navigate(to: ~p"/dashboard/ai-chat/#{conversation_id}")}
   end
 
   @impl true
@@ -306,7 +303,7 @@ defmodule Admin.AiChatLive do
            |> assign(:current_conversation, nil)
            |> assign(:messages, [])
            |> assign(:show_mobile_drawer, false)
-           |> push_navigate(to: ~p"/dashboard/super_admin/ai-chat")}
+           |> push_navigate(to: ~p"/dashboard/ai-chat")}
         else
           {:noreply, socket}
         end
@@ -652,7 +649,7 @@ defmodule Admin.AiChatLive do
     socket = if Map.get(socket.assigns, :is_new_conversation, false) do
       socket
       |> assign(:is_new_conversation, false)
-      |> push_navigate(to: ~p"/dashboard/super_admin/ai-chat/#{conversation_id}")
+      |> push_navigate(to: ~p"/dashboard/ai-chat/#{conversation_id}")
     else
       socket
     end
@@ -922,12 +919,12 @@ defmodule Admin.AiChatLive do
     ~H"""
     <div class="space-y-6">
       <!-- Model Information -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="bg-info/10 border border-info/20 rounded-lg p-4">
         <div class="flex items-center gap-2 mb-2">
-          <.icon name="hero-information-circle" class="h-4 w-4 text-blue-600" />
-          <span class="text-sm font-medium text-blue-900">Selected Model: {@selected_model}</span>
+          <.icon name="hero-information-circle" class="h-4 w-4 text-info" />
+          <span class="text-sm font-medium text-info-content">Selected Model: {@selected_model}</span>
         </div>
-        <p class="text-xs text-blue-700">
+        <p class="text-xs text-info-content/80">
           Provider: <span class="font-medium capitalize">{@provider}</span>
           <%= case @provider do %>
             <% :anthropic -> %>
@@ -942,12 +939,12 @@ defmodule Admin.AiChatLive do
 
       <!-- Compatibility Warnings -->
       <%= if length(@warnings) > 0 do %>
-        <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+        <div class="bg-warning/10 border border-warning/20 rounded-lg p-4">
           <div class="flex items-start gap-2">
-            <.icon name="hero-exclamation-triangle" class="h-4 w-4 text-orange-600 mt-0.5 flex-shrink-0" />
+            <.icon name="hero-exclamation-triangle" class="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
             <div class="space-y-1">
               <%= for warning <- @warnings do %>
-                <p class="text-xs text-orange-800">{warning}</p>
+                <p class="text-xs text-warning-content/80">{warning}</p>
               <% end %>
             </div>
           </div>
@@ -966,13 +963,13 @@ defmodule Admin.AiChatLive do
         <%= if parameter_supported_for_model?(:max_tokens, @model_api_id) do %>
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-900">Max Tokens</label>
+              <label class="text-sm font-medium text-base-content">Max Tokens</label>
               <div class="flex items-center gap-2">
                 <span class={[
                   "text-xs px-2 py-1 rounded-full",
                   if(@max_tokens_active,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-gray-100 text-gray-600"
+                    do: "bg-success/20 text-success-content",
+                    else: "bg-base-200 text-base-content/70"
                   )
                 ]}>
                   {if @max_tokens_active, do: "Active", else: "Inactive"}
@@ -1001,13 +998,13 @@ defmodule Admin.AiChatLive do
                   if(!@max_tokens_active, do: "opacity-50 pointer-events-none", else: "")
                 ]}
               />
-              <div class="flex justify-between text-xs text-gray-500">
+              <div class="flex justify-between text-xs text-base-content/70">
                 <span>1</span>
                 <span class="font-medium">{@max_tokens}</span>
                 <span>4096</span>
               </div>
             </div>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-base-content/70">
               Maximum number of tokens to generate in the response.
             </p>
           </div>
@@ -1020,13 +1017,13 @@ defmodule Admin.AiChatLive do
             if(@provider == :openai && @top_p_active, do: "opacity-75", else: "")
           ]}>
             <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-900">Temperature</label>
+              <label class="text-sm font-medium text-base-content">Temperature</label>
               <div class="flex items-center gap-2">
                 <span class={[
                   "text-xs px-2 py-1 rounded-full",
                   if(@temperature_active,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-gray-100 text-gray-600"
+                    do: "bg-success/20 text-success-content",
+                    else: "bg-base-200 text-base-content/70"
                   )
                 ]}>
                   {if @temperature_active, do: "Active", else: "Inactive"}
@@ -1055,16 +1052,16 @@ defmodule Admin.AiChatLive do
                   if(!@temperature_active, do: "opacity-50 pointer-events-none", else: "")
                 ]}
               />
-              <div class="flex justify-between text-xs text-gray-500">
+              <div class="flex justify-between text-xs text-base-content/70">
                 <span>0.00</span>
                 <span class="font-medium">{Float.round(@temperature, 2)}</span>
                 <span>2.00</span>
               </div>
             </div>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-base-content/70">
               Controls randomness. Lower values make responses more focused and deterministic.
               <%= if @provider == :openai do %>
-                <br /><span class="text-orange-600">OpenAI range: 0.0-2.0</span>
+                <br /><span class="text-warning">OpenAI range: 0.0-2.0</span>
               <% end %>
             </p>
           </div>
@@ -1074,13 +1071,13 @@ defmodule Admin.AiChatLive do
         <%= if parameter_supported_for_model?(:top_k, @model_api_id) do %>
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-900">Top K</label>
+              <label class="text-sm font-medium text-base-content">Top K</label>
               <div class="flex items-center gap-2">
                 <span class={[
                   "text-xs px-2 py-1 rounded-full",
                   if(@top_k_active,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-gray-100 text-gray-600"
+                    do: "bg-success/20 text-success-content",
+                    else: "bg-base-200 text-base-content/70"
                   )
                 ]}>
                   {if @top_k_active, do: "Active", else: "Inactive"}
@@ -1109,13 +1106,13 @@ defmodule Admin.AiChatLive do
                   if(!@top_k_active, do: "opacity-50 pointer-events-none", else: "")
                 ]}
               />
-              <div class="flex justify-between text-xs text-gray-500">
+              <div class="flex justify-between text-xs text-base-content/70">
                 <span>1</span>
                 <span class="font-medium">{@top_k}</span>
                 <span>40</span>
               </div>
             </div>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-base-content/70">
               Limits the number of highest probability tokens to consider. Only available for Anthropic models.
             </p>
           </div>
@@ -1128,13 +1125,13 @@ defmodule Admin.AiChatLive do
             if(@provider == :openai && @temperature_active, do: "opacity-75", else: "")
           ]}>
             <div class="flex items-center justify-between">
-              <label class="text-sm font-medium text-gray-900">Top P</label>
+              <label class="text-sm font-medium text-base-content">Top P</label>
               <div class="flex items-center gap-2">
                 <span class={[
                   "text-xs px-2 py-1 rounded-full",
                   if(@top_p_active,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-gray-100 text-gray-600"
+                    do: "bg-success/20 text-success-content",
+                    else: "bg-base-200 text-base-content/70"
                   )
                 ]}>
                   {if @top_p_active, do: "Active", else: "Inactive"}
@@ -1160,16 +1157,16 @@ defmodule Admin.AiChatLive do
                 step="1"
                 class={["range range-sm", if(!@top_p_active, do: "opacity-50 pointer-events-none", else: "")]}
               />
-              <div class="flex justify-between text-xs text-gray-500">
+              <div class="flex justify-between text-xs text-base-content/70">
                 <span>0.01</span>
                 <span class="font-medium">{Float.round(@top_p, 2)}</span>
                 <span>1.00</span>
               </div>
             </div>
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-base-content/70">
               Cumulative probability cutoff for token selection (nucleus sampling).
               <%= if @provider == :openai do %>
-                <br /><span class="text-orange-600">OpenAI recommends using either Temperature OR Top P, not both.</span>
+                <br /><span class="text-warning">OpenAI recommends using either Temperature OR Top P, not both.</span>
               <% end %>
             </p>
           </div>
@@ -1285,9 +1282,9 @@ defmodule Admin.AiChatLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <div class="flex h-[calc(100vh-90px)]">
+    <div class="flex-1 h-[calc(100vh-100px)]">
       <div class={[
-        "hidden lg:flex bg-white transition-all duration-300 bg-blue-100 flex-shrink-0",
+        "hidden lg:flex bg-base-100 transition-all duration-300 flex-shrink-0",
         if(@sidebar_open, do: "w-80", else: "w-0 overflow-hidden")
       ]}>
         <div class="h-full flex flex-col w-full">
@@ -1334,7 +1331,7 @@ defmodule Admin.AiChatLive do
           <div class="flex items-center">
             <button
               phx-click="toggle_sidebar"
-              class="hidden lg:flex -ml-2 p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+              class="hidden lg:flex -ml-2 p-2 text-base-content/40 hover:text-base-content/60 rounded-lg"
             >
               <.icon name="hero-panel-left" class="h-5 w-5" />
             </button>
@@ -1378,11 +1375,11 @@ defmodule Admin.AiChatLive do
           </div>
         </div>
 
-        <div class="flex-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col min-h-0">
+        <div class="flex-1 bg-base-100 rounded-lg shadow-sm border border-base-300 flex flex-col min-h-0">
           <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chat-messages">
             <%= if Enum.empty?(@messages) do %>
-              <div class="text-center text-gray-500 mt-8">
-                <.icon name="hero-chat-bubble-left-right" class="h-12 w-12 mx-auto mb-2 text-gray-300" />
+              <div class="text-center text-base-content/70 mt-8">
+                <.icon name="hero-chat-bubble-left-right" class="h-12 w-12 mx-auto mb-2 text-base-content/30" />
                 <p>
                   <%= if @current_conversation do %>
                     Start chatting in this conversation!
@@ -1393,11 +1390,11 @@ defmodule Admin.AiChatLive do
                 <p class="text-sm mt-2">
                   Current model: <span class="font-medium">{@selected_model}</span>
                 </p>
-                <p class="text-xs text-gray-400 mt-1">
+                <p class="text-xs text-base-content/40 mt-1">
                   System prompt: <span class="font-medium">{@selected_system_prompt}</span>
                 </p>
                 <%= if @max_tokens_active || @temperature_active || @top_k_active || @top_p_active do %>
-                  <p class="text-xs text-blue-600 mt-1">
+                  <p class="text-xs text-info mt-1">
                     <.icon name="hero-cog-6-tooth" class="h-3 w-3 inline mr-1" /> Advanced parameters: Active
                   </p>
                 <% end %>
@@ -1415,9 +1412,9 @@ defmodule Admin.AiChatLive do
                   <div class={[
                     "max-w-[70%] rounded-lg px-4 py-2",
                     case message.role do
-                      "user" -> "bg-black text-white"
-                      "assistant" -> "bg-gray-100 text-gray-900"
-                      "system" -> "bg-red-100 text-red-800 text-sm"
+                      "user" -> "bg-neutral text-neutral-content"
+                      "assistant" -> "bg-base-200 text-base-content"
+                      "system" -> "bg-error/20 text-error text-sm"
                     end
                   ]}>
                     <div class="flex items-center gap-2">
@@ -1429,13 +1426,13 @@ defmodule Admin.AiChatLive do
                           <.icon name="hero-sparkles" class="h-4 w-4" />
                           <span class="text-sm font-medium">AI</span>
                           <%= if message.model do %>
-                            <span class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                            <span class="text-xs bg-base-300 text-base-content/70 px-2 py-0.5 rounded-full">
                               {message.model}
                             </span>
                           <% end %>
                           <%= if has_active_advanced_params?(message) do %>
                             <span
-                              class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                              class="text-xs bg-info/20 text-info-content px-2 py-0.5 rounded-full"
                               title="Advanced parameters used"
                             >
                               <.icon name="hero-cog-6-tooth" class="h-3 w-3 inline mr-1" /> Advanced
@@ -1452,7 +1449,7 @@ defmodule Admin.AiChatLive do
                     <div class="break-words">
                       <%= case message.role do %>
                         <% "assistant" -> %>
-                          <div class="mt-1 prose prose-md max-w-none prose-gray prose-headings:text-gray-900 prose-code:text-gray-100 prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-medium prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:text-sm prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-gray-300">
+                          <div class="mt-1 prose prose-md max-w-none">
                             {Markdown.to_html(message.content)}
                           </div>
                         <% _ -> %>
@@ -1468,16 +1465,16 @@ defmodule Admin.AiChatLive do
 
             <%= if @streaming do %>
               <div class="flex justify-start">
-                <div class="bg-gray-100 rounded-lg px-4 py-2 max-w-[70%]">
+                <div class="bg-base-200 rounded-lg px-4 py-2 max-w-[70%]">
                   <div class="flex items-center gap-2 mb-1">
                     <.icon name="hero-sparkles" class="h-4 w-4" />
                     <span class="text-sm font-medium">AI</span>
-                    <span class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+                    <span class="text-xs bg-base-300 text-base-content/70 px-2 py-0.5 rounded-full">
                       {@selected_model}
                     </span>
                     <%= if @max_tokens_active || @temperature_active || @top_k_active || @top_p_active do %>
                       <span
-                        class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full"
+                        class="text-xs bg-info/20 text-info-content px-2 py-0.5 rounded-full"
                         title="Advanced parameters active"
                       >
                         <.icon name="hero-cog-6-tooth" class="h-3 w-3 inline mr-1" /> Advanced
@@ -1486,22 +1483,22 @@ defmodule Admin.AiChatLive do
                   </div>
                   <%= if @current_stream != "" do %>
                     <div class="break-words">
-                      <div class="mt-1 prose prose-md max-w-none prose-gray prose-headings:text-gray-900 prose-code:text-gray-100 prose-code:bg-gray-800 prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-medium prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:text-sm prose-pre:p-4 prose-pre:rounded-lg prose-blockquote:border-l-gray-300">
+                      <div class="mt-1 prose prose-md max-w-none">
                         {Markdown.to_html(@current_stream)}
                       </div>
                     </div>
                   <% end %>
                   <div class="flex items-center gap-1 mt-4">
                     <div
-                      class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      class="w-2 h-2 bg-base-content/40 rounded-full animate-bounce"
                       style="animation-delay: 0.1s"
                     />
                     <div
-                      class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      class="w-2 h-2 bg-base-content/40 rounded-full animate-bounce"
                       style="animation-delay: 0.2s"
                     />
                     <div
-                      class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                      class="w-2 h-2 bg-base-content/40 rounded-full animate-bounce"
                       style="animation-delay: 0.3s"
                     />
                   </div>
@@ -1510,7 +1507,7 @@ defmodule Admin.AiChatLive do
             <% end %>
           </div>
 
-          <div class="border-t border-gray-200 px-4 pb-2 flex-shrink-0">
+          <div class="border-t border-base-300 px-4 pb-2 flex-shrink-0">
             <.form for={%{}} as={:chat_form} phx-submit="send_message" class="flex items-center gap-3">
               <button
                 type="button"

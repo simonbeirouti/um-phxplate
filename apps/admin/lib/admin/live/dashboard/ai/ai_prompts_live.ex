@@ -15,7 +15,7 @@ defmodule Admin.AiPromptsLive do
     {:ok,
      socket
      |> assign(:show_drawer, false)
-     |> assign(:drawer_mode, "create")
+     |> assign(:drawer_mode, nil)
      |> assign(:selected_item, nil)
      |> assign(:selected_model, Models.default_model_display_name())
      |> assign(:category_filter, "all")
@@ -30,15 +30,12 @@ defmodule Admin.AiPromptsLive do
      |> PageMeta.assign_metadata(
        title: "AI Prompts",
        description: "Manage AI prompts",
-       url: "/dashboard/super_admin/ai-prompts"
+       url: "/dashboard/ai-prompts"
      )}
   end
 
   @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     page = String.to_integer(Map.get(params, "page", "1"))
 
     {:noreply,
@@ -165,7 +162,8 @@ defmodule Admin.AiPromptsLive do
     {:noreply,
      socket
      |> assign(:show_drawer, false)
-     |> assign(:selected_item, nil)}
+     |> assign(:selected_item, nil)
+     |> assign(:drawer_mode, nil)}
   end
 
   @impl true
@@ -246,7 +244,7 @@ defmodule Admin.AiPromptsLive do
      socket
      |> assign(:page, page)
      |> load_prompts()
-     |> push_patch(to: ~p"/dashboard/super_admin/ai-prompts?page=#{page}")}
+     |> push_patch(to: ~p"/dashboard/ai-prompts?page=#{page}")}
   end
 
   defp load_prompts(socket) do
@@ -347,6 +345,8 @@ defmodule Admin.AiPromptsLive do
               <.prompt_view item={@selected_item} />
             <% mode when mode in ["create_prompt", "edit_prompt"] -> %>
               <.prompt_form item={@selected_item} mode={@drawer_mode} />
+            <% nil -> %>
+              <%# Render nothing when drawer_mode is nil %>
           <% end %>
         </div>
         <form method="dialog" class="modal-backdrop" phx-click="close_drawer">
@@ -360,19 +360,21 @@ defmodule Admin.AiPromptsLive do
   defp get_drawer_title("create_prompt"), do: "Create New Prompt"
   defp get_drawer_title("edit_prompt"), do: "Edit Prompt"
   defp get_drawer_title("view_prompt"), do: "View Prompt"
+  defp get_drawer_title(_), do: ""
 
   defp get_drawer_description("create_prompt"), do: "Create a new AI prompt for your collection"
   defp get_drawer_description("edit_prompt"), do: "Edit the selected AI prompt"
   defp get_drawer_description("view_prompt"), do: "View prompt details and content"
+  defp get_drawer_description(_), do: ""
 
   defp empty_state(assigns) do
     ~H"""
     <div class="text-center py-12">
-      <div class="mx-auto h-12 w-12 text-gray-400">
+      <div class="mx-auto h-12 w-12 text-base-content/40">
         <.icon name="hero-chat-bubble-bottom-center-text" class="h-12 w-12" />
       </div>
-      <h3 class="mt-2 text-sm font-medium text-gray-900">{@title}</h3>
-      <p class="mt-1 text-sm text-gray-500">{@description}</p>
+      <h3 class="mt-2 text-sm font-medium text-base-content">{@title}</h3>
+      <p class="mt-1 text-sm text-base-content/70">{@description}</p>
       <div class="mt-6">
         <button phx-click={@action_event} class="btn btn-neutral">
           <.icon name="hero-plus" class="h-4 w-4 mr-2" />
@@ -387,24 +389,24 @@ defmodule Admin.AiPromptsLive do
     ~H"""
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <%= for prompt <- @prompts do %>
-        <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200">
+        <div class="bg-base-100 rounded-lg border border-base-300 shadow-sm hover:shadow-md transition-shadow duration-200">
           <div class="p-6">
             <div class="flex items-start justify-between mb-3">
-              <h3 class="text-lg font-semibold text-gray-900 truncate pr-2">
+              <h3 class="text-lg font-semibold text-base-content truncate pr-2">
                 {prompt.name}
               </h3>
-              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-base-200 text-base-content/80 whitespace-nowrap">
                 {Prompt.format_category(prompt.category)}
               </span>
             </div>
 
             <%= if prompt.description do %>
-              <p class="text-sm text-gray-600 mb-4 line-clamp-3">
+              <p class="text-sm text-base-content/70 mb-4 line-clamp-3">
                 {String.slice(prompt.description, 0, 250)}{if String.length(prompt.description) > 250,
                   do: "..."}
               </p>
             <% else %>
-              <p class="text-sm text-gray-400 mb-4 italic">No description provided</p>
+              <p class="text-sm text-base-content/50 mb-4 italic">No description provided</p>
             <% end %>
 
             <div class="flex items-center justify-between">
@@ -412,13 +414,13 @@ defmodule Admin.AiPromptsLive do
                 <span class={[
                   "inline-flex px-2 py-1 text-xs font-semibold rounded-full",
                   if(prompt.is_active,
-                    do: "bg-green-100 text-green-800",
-                    else: "bg-red-100 text-red-800"
+                    do: "bg-success/20 text-success-content",
+                    else: "bg-error/20 text-error-content"
                   )
                 ]}>
                   {if prompt.is_active, do: "Active", else: "Inactive"}
                 </span>
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-base-content/50">
                   {Calendar.strftime(prompt.inserted_at, "%b %d, %Y")}
                 </span>
               </div>
@@ -470,16 +472,16 @@ defmodule Admin.AiPromptsLive do
     <div class="space-y-6">
       <div class="flex items-start justify-between">
         <div>
-          <h2 class="text-xl font-semibold text-gray-900">{@item.name}</h2>
-          <span class="inline-flex px-2 py-1 text-sm font-semibold rounded-full bg-gray-100 text-gray-800 mt-2">
+          <h2 class="text-xl font-semibold text-base-content">{@item.name}</h2>
+          <span class="inline-flex px-2 py-1 text-sm font-semibold rounded-full bg-base-200 text-base-content/80 mt-2">
             {Prompt.format_category(@item.category)}
           </span>
         </div>
         <span class={[
           "inline-flex px-3 py-1 text-sm font-semibold rounded-full",
           if(@item.is_active,
-            do: "bg-green-100 text-green-800",
-            else: "bg-red-100 text-red-800"
+            do: "bg-success/20 text-success-content",
+            else: "bg-error/20 text-error-content"
           )
         ]}>
           {if @item.is_active, do: "Active", else: "Inactive"}
@@ -488,26 +490,26 @@ defmodule Admin.AiPromptsLive do
 
       <%= if @item.description do %>
         <div>
-          <h3 class="text-sm font-medium text-gray-900 mb-2">Description</h3>
-          <p class="text-sm text-gray-600">{@item.description}</p>
+          <h3 class="text-sm font-medium text-base-content mb-2">Description</h3>
+          <p class="text-sm text-base-content/70">{@item.description}</p>
         </div>
       <% end %>
 
       <div>
-        <h3 class="text-sm font-medium text-gray-900 mb-2">Prompt Content</h3>
-        <div class="bg-gray-50 rounded-lg p-4">
-          <pre class="text-sm text-gray-800 whitespace-pre-wrap font-mono">{@item.content}</pre>
+        <h3 class="text-sm font-medium text-base-content mb-2">Prompt Content</h3>
+        <div class="bg-base-200 rounded-lg p-4">
+          <pre class="text-sm text-base-content whitespace-pre-wrap font-mono">{@item.content}</pre>
         </div>
       </div>
 
       <div>
-        <h4 class="text-sm font-medium text-gray-900">Created</h4>
-        <p class="text-sm text-gray-600">
+        <h4 class="text-sm font-medium text-base-content">Created</h4>
+        <p class="text-sm text-base-content/70">
           {Calendar.strftime(@item.inserted_at, "%B %d, %Y at %I:%M %p")}
         </p>
       </div>
 
-      <div class="flex flex-col space-y-3 pt-4 border-t border-gray-200">
+      <div class="flex flex-col space-y-3 pt-4 border-t border-base-300">
         <button phx-click="edit_prompt" phx-value-id={@item.id} class="btn btn-neutral w-full">
           <.icon name="hero-pencil" class="h-4 w-4 mr-2" /> Edit Prompt
         </button>

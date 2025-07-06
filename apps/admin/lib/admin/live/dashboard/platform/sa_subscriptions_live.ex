@@ -50,15 +50,12 @@ defmodule Admin.SubscriptionsLive do
      |> PageMeta.assign_metadata(
        title: "Subscription Management",
        description: "Manage subscription plans and user subscriptions",
-       url: "/dashboard/super_admin/subscriptions"
+       url: "/dashboard/subscriptions"
      )}
   end
 
     @impl true
-  def handle_params(params, url, socket) do
-    uri = URI.parse(url)
-    socket = Phoenix.Component.update(socket, :layout_data, &Map.put(&1, :current_path, uri.path))
-
+  def handle_params(params, _url, socket) do
     tab = Map.get(params, "tab", "monthly")
     {:noreply,
      socket
@@ -75,7 +72,7 @@ defmodule Admin.SubscriptionsLive do
      |> assign(:selected_item, nil)
      |> assign(:selected_type, nil)
      |> assign(:show_drawer, false)
-     |> push_patch(to: ~p"/dashboard/super_admin/subscriptions?tab=#{tab}")}
+     |> push_patch(to: ~p"/dashboard/subscriptions")}
   end
 
     @impl true
@@ -901,17 +898,17 @@ defmodule Admin.SubscriptionsLive do
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Description</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Description</h4>
                 <p class="mt-1">{@selected_item.description || "No description"}</p>
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Price</h4>
-                  <p class="mt-1 text-2xl font-bold text-gray-900">
+                  <h4 class="text-sm font-medium text-base-content/70">Price</h4>
+                  <p class="mt-1 text-2xl font-bold text-base-content">
                     {format_currency(@selected_item.unit_amount)}
                   </p>
-                  <p class="text-sm text-gray-500">
+                  <p class="text-sm text-base-content/70">
                     <%= if @selected_item.interval == "one_time" do %>
                       one-time purchase
                     <% else %>
@@ -921,24 +918,24 @@ defmodule Admin.SubscriptionsLive do
                 </div>
 
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Tier</h4>
+                  <h4 class="text-sm font-medium text-base-content/70">Tier</h4>
                   <p class="mt-1 capitalize">{@selected_item.metadata["tier"] || "None"}</p>
                 </div>
               </div>
 
               <div>
-                <h4 class="text-sm font-medium text-gray-500">Currency</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Currency</h4>
                 <p class="mt-1 uppercase">{@selected_item.currency}</p>
               </div>
 
               <%= if @selected_item.features && map_size(@selected_item.features) > 0 do %>
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Features</h4>
+                  <h4 class="text-sm font-medium text-base-content/70">Features</h4>
                   <div class="mt-1 space-y-1">
                     <%= for key <- get_ordered_feature_keys(@selected_item) do %>
                       <% value = Map.get(@selected_item.features, key, "") %>
-                      <div class="flex justify-between py-1 border-b border-gray-100">
-                        <span class="text-sm text-gray-600 capitalize">{key}:</span>
+                      <div class="flex justify-between py-1 border-b border-base-300">
+                        <span class="text-sm text-base-content/80 capitalize">{key}:</span>
                         <span class="text-sm font-medium">{value}</span>
                       </div>
                     <% end %>
@@ -946,28 +943,28 @@ defmodule Admin.SubscriptionsLive do
                 </div>
               <% else %>
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500">Features</h4>
-                  <p class="mt-1 text-sm text-gray-500 italic">No features defined</p>
+                  <h4 class="text-sm font-medium text-base-content/70">Features</h4>
+                  <p class="mt-1 text-sm text-base-content/70 italic">No features defined</p>
                 </div>
               <% end %>
 
               <div class="border-t pt-4">
-                <h4 class="text-sm font-medium text-gray-500">Stripe Information</h4>
+                <h4 class="text-sm font-medium text-base-content/70">Stripe Information</h4>
                 <div class="mt-2 space-y-2">
                   <div>
-                    <span class="text-xs text-gray-500">Product ID:</span>
-                    <p class="text-xs font-mono bg-gray-100 p-1 rounded">{@selected_item.stripe_product_id}</p>
+                    <span class="text-xs text-base-content/70">Product ID:</span>
+                    <p class="text-xs font-mono bg-base-200 p-1 rounded">{@selected_item.stripe_product_id}</p>
                   </div>
                   <div>
-                    <span class="text-xs text-gray-500">Price ID:</span>
-                    <p class="text-xs font-mono bg-gray-100 p-1 rounded">{@selected_item.stripe_price_id}</p>
+                    <span class="text-xs text-base-content/70">Price ID:</span>
+                    <p class="text-xs font-mono bg-base-200 p-1 rounded">{@selected_item.stripe_price_id}</p>
                   </div>
                 </div>
               </div>
 
               <div class="border-t pt-4">
-                <h4 class="text-sm font-medium text-gray-500">Timestamps</h4>
-                <div class="flex justify-between items-center mt-2 text-xs text-gray-500">
+                <h4 class="text-sm font-medium text-base-content/70">Timestamps</h4>
+                <div class="flex justify-between items-center mt-2 text-xs text-base-content/70">
                   <p>Created: {Calendar.strftime(@selected_item.inserted_at, "%B %d, %Y at %H:%M")}</p>
                   <p>Updated: {Calendar.strftime(@selected_item.updated_at, "%B %d, %Y at %H:%M")}</p>
                 </div>

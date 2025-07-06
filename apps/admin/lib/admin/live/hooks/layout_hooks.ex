@@ -75,25 +75,25 @@ defmodule Admin.Live.Hooks.LayoutHooks do
             label: "Subscriptions",
             path: "/dashboard/subscriptions",
             icon: "hero-credit-card",
-            active_paths: ["/subscriptions"]
+            active_paths: ["/dashboard/subscriptions"]
           },
           %{
             label: "Blogs",
             path: "/dashboard/blogs",
             icon: "hero-document-text",
-            active_paths: ["/blogs"]
+            active_paths: ["/dashboard/blogs"]
           },
           %{
             label: "Companies",
             path: "/dashboard/companies",
             icon: "hero-building-office",
-            active_paths: ["/companies"]
+            active_paths: ["/dashboard/companies"]
           },
           %{
             label: "Settings",
             path: "/dashboard/platform-settings",
             icon: "hero-cog-6-tooth",
-            active_paths: ["/platform-settings"]
+            active_paths: ["/dashboard/platform-settings"]
           }
         ]
       },
@@ -104,19 +104,19 @@ defmodule Admin.Live.Hooks.LayoutHooks do
             label: "Support Chat",
             path: "/dashboard/chat",
             icon: "hero-chat-bubble-left-right",
-            active_paths: ["/chat"]
+            active_paths: ["/dashboard/chat"]
           },
           %{
             label: "Feature/Feedback",
             path: "/dashboard/feature-feedbacks",
             icon: "hero-light-bulb",
-            active_paths: ["/feature-feedbacks"]
+            active_paths: ["/dashboard/feature-feedbacks"]
           },
           %{
             label: "Users",
             path: "/dashboard/users",
             icon: "hero-users",
-            active_paths: ["/users"]
+            active_paths: ["/dashboard/users"]
           }
         ]
       },
@@ -127,31 +127,31 @@ defmodule Admin.Live.Hooks.LayoutHooks do
             label: "AI Chat",
             path: "/dashboard/ai-chat",
             icon: "hero-cpu-chip",
-            active_paths: ["/ai-chat"]
+            active_paths: ["/dashboard/ai-chat"]
           },
           %{
             label: "AI Prompts",
             path: "/dashboard/ai-prompts",
             icon: "hero-command-line",
-            active_paths: ["/ai-prompts"]
+            active_paths: ["/dashboard/ai-prompts"]
           },
           %{
             label: "AI Evaluations",
             path: "/dashboard/ai-evals",
             icon: "hero-chart-bar",
-            active_paths: ["/ai-evals"]
+            active_paths: ["/dashboard/ai-evals"]
           },
           %{
             label: "AI Eval Results",
             path: "/dashboard/ai-eval-results",
             icon: "hero-chart-pie",
-            active_paths: ["/ai-eval-results"]
+            active_paths: ["/dashboard/ai-eval-results"]
           },
           %{
             label: "AI Results",
             path: "/dashboard/ai-results",
             icon: "hero-clipboard-document-list",
-            active_paths: ["/ai-results"]
+            active_paths: ["/dashboard/ai-results"]
           }
         ]
       }
