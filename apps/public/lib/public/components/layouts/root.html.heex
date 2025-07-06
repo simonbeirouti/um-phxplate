@@ -58,11 +58,23 @@
           localStorage.setItem("phx:theme", theme);
           document.documentElement.setAttribute("data-theme", theme);
         };
+        
+        const toggleTheme = () => {
+          const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+          const newTheme = currentTheme === "light" ? "dark" : "light";
+          setTheme(newTheme);
+        };
+        
+        // Expose toggleTheme function globally for onclick handlers
+        window.toggleTheme = toggleTheme;
+        
         if (!document.documentElement.hasAttribute("data-theme")) {
           setTheme(localStorage.getItem("phx:theme") || "light");
         }
+        
         window.addEventListener("storage", (e) => e.key === "phx:theme" && setTheme(e.newValue || "light"));
         window.addEventListener("phx:set-theme", ({ detail: { theme } }) => setTheme(theme));
+        window.addEventListener("phx:toggle-theme", toggleTheme);
       })();
     </script>
   </head>

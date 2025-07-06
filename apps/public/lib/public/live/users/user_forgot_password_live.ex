@@ -28,13 +28,13 @@ defmodule Public.UserForgotPasswordLive do
 
         <form class="form-control" id="reset_password_form" phx-submit="send_email">
           <fieldset class="fieldset w-full">
-            <input class="input text-base" name={@form[:email].name} id={@form[:email].id} value={@form[:email].value} type="email" placeholder="your@email.com" required />
-            <button phx-disable-with="Sending..." class="btn btn-primary mt-4 w-full">
+            <input class="input w-full text-base" name={@form[:email].name} id={@form[:email].id} value={@form[:email].value} type="email" placeholder="your@email.com" required />
+            <button phx-disable-with="Sending..." class="btn btn-primary my-2 w-full">
               Send password reset instructions
             </button>
           </fieldset>
         </form>
-        <div class="flex flex-col items-center justify-center gap-4 mt-4">
+        <div class="flex flex-col items-center justify-center gap-4">
           <div class="w-full h-px bg-primary/50" />
           <.link class="w-full" href={~p"/register"}>
             <button class="btn w-full">Register</button>

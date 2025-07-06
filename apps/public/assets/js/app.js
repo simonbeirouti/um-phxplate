@@ -25,6 +25,21 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Hooks from "./hooks"
 
+// Charts
+import "./charts/apex-area.js"
+import "./charts/apex-bar.js"
+import "./charts/apex-column.js"
+import "./charts/apex-line.js"
+import "./charts/apex-pie.js"
+
+// Dashboards
+import "./dashboards/crm.js"
+import "./dashboards/ecommerce.js"
+import "./dashboards/gen-ai.js"
+
+// Landing
+import "./landing.js"
+
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
@@ -80,4 +95,3 @@ if (process.env.NODE_ENV === "development") {
     window.liveReloader = reloader
   })
 }
-

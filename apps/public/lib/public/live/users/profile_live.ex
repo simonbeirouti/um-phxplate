@@ -24,24 +24,26 @@ defmodule Public.Onboarding.ProfileLive do
   def render(assigns) do
     ~H"""
     <div class="max-w-2xl mx-auto py-16 px-4">
-      <.modal :if={@show_success} id="success-modal" show>
+      <.live_component
+        module={Public.Components.ModalComponent}
+        id="success-modal"
+        show={@show_success}
+        title="Onboarding Complete!"
+      >
         <div class="text-center">
           <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-success/20 mb-4">
             <.icon name="hero-check-circle" class="h-8 w-8 text-success" />
           </div>
-          <.header>
-            Onboarding Complete!
-            <:subtitle>
-              Thank you for setting up your profile.
-              <%= if @has_selected_plan do %>
-                Redirecting to complete your subscription...
-              <% else %>
-                Redirecting to dashboard...
-              <% end %>
-            </:subtitle>
-          </.header>
+          <p>
+            Thank you for setting up your profile.
+            <%= if @has_selected_plan do %>
+              Redirecting to complete your subscription...
+            <% else %>
+              Redirecting to dashboard...
+            <% end %>
+          </p>
         </div>
-      </.modal>
+      </.live_component>
 
       <div class="mb-8 flex justify-center">
         <div class="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
@@ -182,6 +184,14 @@ defmodule Public.Onboarding.ProfileLive do
       |> assign_form(changeset)
 
     {:ok, socket}
+  end
+
+  def handle_event("close", _params, socket) do
+    {:noreply, assign(socket, :show_success, false)}
+  end
+
+  def handle_info({:close_modal, "success-modal"}, socket) do
+    {:noreply, assign(socket, :show_success, false)}
   end
 
   def handle_info(:redirect_after_onboarding, socket) do

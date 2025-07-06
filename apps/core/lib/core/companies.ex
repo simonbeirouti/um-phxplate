@@ -12,6 +12,7 @@ defmodule Core.Companies do
   alias Core.Companies.Company
   alias Core.Companies.Employee
   alias Core.Companies.Invitation
+  alias Core.Subscriptions
   alias Core.PubSub.DataSync
   alias Core.EndpointHelper
 
@@ -76,6 +77,15 @@ defmodule Core.Companies do
   end
 
   @doc """
+  Counts the number of companies owned by a specific user.
+  """
+  def count_companies_by_owner(user_id) do
+    Company
+    |> where(owner_id: ^user_id)
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
   Creates a company with the given attributes.
 
   Also handles tracking the activity and broadcasting the creation event.
@@ -91,21 +101,25 @@ defmodule Core.Companies do
       iex> create_company(%{name: ""})
       {:error, %Ecto.Changeset{}}
   """
-  def create_company(attrs \\ %{}) do
-    %Company{}
-    |> Company.changeset(attrs)
-    |> Repo.insert()
-    |> case do
-      {:ok, company} ->
-        # Preload all necessary associations
-        company = Repo.preload(company, [:owner, employees: [:profile]])
-        # Track activity
-        Core.Tracking.track_company_activity("company_create", company, company.owner)
-        # Broadcast creation
-        DataSync.broadcast("companies", company.id, {:created, %{type: :company, company: company}})
-        DataSync.broadcast("companies", "all", {:created, %{type: :company, company: company}})
-        {:ok, company}
-      error -> error
+  def create_company(attrs \\ %{}, user) do
+    if Subscriptions.can_create_company?(user) do
+      %Company{}
+      |> Company.changeset(attrs)
+      |> Repo.insert()
+      |> case do
+        {:ok, company} ->
+          # Preload all necessary associations
+          company = Repo.preload(company, [:owner, employees: [:profile]])
+          # Track activity
+          Core.Tracking.track_company_activity("company_create", company, company.owner)
+          # Broadcast creation
+          DataSync.broadcast("companies", company.id, {:created, %{type: :company, company: company}})
+          DataSync.broadcast("companies", "all", {:created, %{type: :company, company: company}})
+          {:ok, company}
+        error -> error
+      end
+    else
+      {:error, :limit_reached}
     end
   end
 
